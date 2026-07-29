@@ -39,7 +39,6 @@
                 <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
                     <i class="fas fa-sign-in-alt mr-2"></i>Login
                 </button>
-                <p class="text-center text-xs text-gray-400">Default password: admin123</p>
             </div>
         </div>
     </div>
@@ -215,7 +214,7 @@
                     <button onclick="changePassword()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">
                         Update Password
                     </button>
-                    <p class="text-xs text-gray-500 mt-2">Current password: <span id="currentPasswordDisplay" class="font-mono bg-gray-100 px-2 py-1 rounded">admin123</span></p>
+                    <p class="text-xs text-gray-500 mt-2">Note: Password change is saved in browser only</p>
                 </div>
                 
                 <div class="border-t pt-4">
@@ -241,9 +240,11 @@
             { id: 6, name: "Weather Station Project", category: "Projects", price: 1200, originalPrice: null, discount: false, image: "https://m.media-amazon.com/images/I/71qS7vGqP+L._SL1500_.jpg", description: "Ready-made weather station with temperature, humidity, and display." }
         ];
 
-        // Load products and password from localStorage
+        // Load products from localStorage
         let adminProducts = JSON.parse(localStorage.getItem('jugadteck_admin_products')) || [...defaultProducts];
-        let adminPassword = localStorage.getItem('jugadteck_admin_password') || 'admin123';
+        
+        // PERMANENT PASSWORD - Hardcoded (Change this in GitHub to change password)
+        let adminPassword = 'singh@12345678';
 
         // Login
         function login() {
@@ -251,7 +252,6 @@
             if (password === adminPassword) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('adminDashboard').classList.remove('hidden');
-                document.getElementById('currentPasswordDisplay').textContent = adminPassword;
                 renderProductsList();
             } else {
                 alert('Incorrect password!');
@@ -385,7 +385,6 @@
         // Settings Functions
         function showSettings() {
             document.getElementById('settingsModal').classList.remove('hidden');
-            document.getElementById('currentPasswordDisplay').textContent = adminPassword;
         }
 
         function closeSettings() {
@@ -398,11 +397,11 @@
                 alert('Password must be at least 4 characters long!');
                 return;
             }
+            // This only changes in browser localStorage, not permanent
+            localStorage.setItem('jugadteck_temp_password', newPassword);
             adminPassword = newPassword;
-            localStorage.setItem('jugadteck_admin_password', adminPassword);
-            document.getElementById('currentPasswordDisplay').textContent = adminPassword;
             document.getElementById('newPassword').value = '';
-            showNotification('Password changed successfully!');
+            showNotification('Password changed (browser only). To make it permanent, edit admin.html on GitHub.');
         }
 
         function showNotification(message) {
