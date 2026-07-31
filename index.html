@@ -10,10 +10,7 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#1e40af',
-                        secondary: '#0ea5e9',
-                    }
+                    colors: { primary: '#1e40af', secondary: '#0ea5e9' }
                 }
             }
         }
@@ -47,50 +44,25 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s; }
         
-        /* FIX 5: 9 lines ke liye max-height badhaya (pehle 150px tha, ab 220px) */
+        /* 9 lines ke liye max-height */
         .scrollable-content { max-height: 220px; overflow-y: auto; padding-right: 10px; }
         .scrollable-content::-webkit-scrollbar { width: 6px; }
         .scrollable-content::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .scrollable-content::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-        
-        /* FIX 1: Mobile par buttons fixed nahi, normal flow mein */
-        .sticky-buy-section { position: sticky; top: 20px; }
-        @media (max-width: 768px) {
-            .sticky-buy-section {
-                position: relative; /* Fixed hata diya, ab scroll hoga */
-                bottom: auto;
-                left: auto;
-                right: auto;
-                top: auto;
-                background: transparent;
-                padding: 0;
-                box-shadow: none;
-                z-index: auto;
-                margin-top: 20px;
-            }
-        }
         
         .floating-whatsapp { position: fixed; bottom: 100px; right: 20px; z-index: 40; animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
         .wishlist-btn { position: absolute; top: 10px; right: 10px; z-index: 10; }
         .wishlist-btn.active { color: #ef4444; }
         
-        /* FIX 3: Dark mode mein specs table fix */
+        /* Dark mode specs table fix */
         .specs-table { width: 100%; }
         .specs-table tr { border-bottom: 1px solid #e5e7eb; }
         .dark .specs-table tr { border-bottom-color: #374151; }
         .specs-table tr:last-child { border-bottom: none; }
         .specs-table td { padding: 10px 12px; vertical-align: top; }
-        .specs-table td:first-child { 
-            font-weight: 600; 
-            color: #374151; 
-            width: 40%;
-            background: #f9fafb;
-        }
-        .dark .specs-table td:first-child {
-            background: #1f2937; /* Dark mode mein dark gray */
-            color: #e5e7eb; /* Light text */
-        }
+        .specs-table td:first-child { font-weight: 600; color: #374151; width: 40%; background: #f9fafb; }
+        .dark .specs-table td:first-child { background: #1f2937; color: #e5e7eb; }
         .specs-table td:last-child { color: #6b7280; }
         .dark .specs-table td:last-child { color: #d1d5db; }
         .dark .specs-table { color: #e5e7eb; }
@@ -239,13 +211,23 @@
                         <i class="fas fa-chevron-right text-xs mx-2"></i> 
                         <span id="detailCategory" class="text-blue-600 font-medium"></span>
                     </div>
-                    <h1 id="detailTitle" class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white leading-tight mb-3"></h1>
+                    
+                    <!-- Title with Wishlist Button -->
+                    <div class="flex items-start justify-between gap-4 mb-3">
+                        <h1 id="detailTitle" class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white leading-tight"></h1>
+                        <button id="detailWishlistBtn" onclick="toggleWishlist(currentProduct.id)" class="text-3xl text-gray-400 hover:text-red-500 transition flex-shrink-0 mt-1">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+
                     <div class="flex items-center gap-3 mb-4 flex-wrap">
                         <span class="bg-green-600 text-white text-sm px-2 py-1 rounded flex items-center gap-1 font-bold">4.5 <i class="fas fa-star text-xs"></i></span>
                         <span class="text-blue-600 font-medium text-sm">1,240 Ratings & 150 Reviews</span>
                         <span class="text-gray-400">|</span>
                         <span class="text-green-600 text-sm font-medium"><i class="fas fa-check-circle mr-1"></i>In Stock</span>
                     </div>
+                    
+                    <!-- Price Block -->
                     <div class="border-t border-b py-4 mb-6 dark:border-gray-700">
                         <div class="flex items-baseline gap-3 flex-wrap">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Price:</span>
@@ -254,6 +236,16 @@
                             <span class="text-lg text-green-600 font-bold" id="detailDiscount"></span>
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Inclusive of all taxes • Free delivery available</p>
+                    </div>
+
+                    <!-- BUY SECTION (Moved right after price) -->
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <button onclick="buyNowWhatsApp()" class="flex-1 bg-yellow-500 text-gray-900 py-3 rounded-lg font-bold hover:bg-yellow-400 transition flex items-center justify-center gap-2 text-lg shadow-md">
+                            <i class="fab fa-whatsapp text-xl"></i> Buy Now
+                        </button>
+                        <button onclick="addToCartFromDetails()" class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2 text-lg shadow-md">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
                     </div>
 
                     <!-- TABS -->
@@ -288,18 +280,6 @@
                                 <div class="flex items-center gap-2 mb-1"><span class="font-bold text-gray-800 dark:text-white">Amit P.</span><span class="text-yellow-500"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span></div>
                                 <p class="text-gray-600 dark:text-gray-300 text-sm">Highly recommended for students and hobbyists!</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- STICKY BUY SECTION - FIX 1: Mobile par ab scroll hoga -->
-                    <div class="sticky-buy-section mt-6">
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <button onclick="buyNowWhatsApp()" class="flex-1 bg-yellow-500 text-gray-900 py-3 rounded-lg font-bold hover:bg-yellow-400 transition flex items-center justify-center gap-2 text-lg shadow-md">
-                                <i class="fab fa-whatsapp text-xl"></i> Buy Now
-                            </button>
-                            <button onclick="addToCartFromDetails()" class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2 text-lg shadow-md">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
                         </div>
                     </div>
 
@@ -387,9 +367,8 @@
             document.documentElement.classList.add('dark');
         }
 
-        // FIX 4: Exit Confirmation - Jab user website se bahar jaane ki koshish kare
+        // Exit Confirmation
         window.addEventListener('beforeunload', function (e) {
-            // Sirf tab confirmation dikhao jab user actively kuch kar raha ho
             if (cart.length > 0) {
                 e.preventDefault();
                 e.returnValue = 'Aapke cart mein items hain. Kya aap sach mein jaana chahte hain?';
@@ -439,12 +418,10 @@
             `).join('');
         }
 
-        // FIX 2: History API - Back button se website se bahar na nikle
         function openProductDetails(id) {
             currentProduct = PRODUCTS.find(p => p.id === id);
             if (!currentProduct) return;
             
-            // Browser history mein entry add karo
             history.pushState({ productOpen: true }, '', '#product-' + id);
             
             if (!recentlyViewed.includes(id)) {
@@ -461,10 +438,18 @@
             document.getElementById('detailPrice').textContent = `₹${currentProduct.price}`;
             document.getElementById('detailDescription').textContent = currentProduct.description;
             
+            // Update Wishlist Button UI in Modal
+            const wishlistBtnIcon = document.querySelector('#detailWishlistBtn i');
+            if (wishlist.includes(currentProduct.id)) {
+                wishlistBtnIcon.className = 'fas fa-heart text-red-500';
+            } else {
+                wishlistBtnIcon.className = 'far fa-heart';
+            }
+
             const origPriceEl = document.getElementById('detailOriginalPrice');
             const discountEl = document.getElementById('detailDiscount');
             if (currentProduct.originalPrice) {
-                origPriceEl.textContent = `₹${currentProduct.originalPrice}`;
+                origPriceEl.textContent = `${currentProduct.originalPrice}`;
                 origPriceEl.style.display = 'inline';
                 const discountPercent = Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100);
                 discountEl.textContent = `${discountPercent}% off`;
@@ -510,9 +495,7 @@
             switchTab('description');
         }
 
-        // FIX 2: Back button handle karna
         window.addEventListener('popstate', function(event) {
-            // Agar product modal open hai, to band karo
             if (document.getElementById('productDetailsModal').classList.contains('active')) {
                 closeProductDetails();
             }
@@ -565,7 +548,6 @@
             document.getElementById('productDetailsModal').classList.remove('active');
             document.body.style.overflow = 'auto';
             currentProduct = null;
-            // History se entry hatao
             if (window.location.hash.startsWith('#product-')) {
                 history.back();
             }
@@ -602,8 +584,21 @@
             if (idx > -1) wishlist.splice(idx, 1);
             else wishlist.push(productId);
             localStorage.setItem('jugadteck_wishlist', JSON.stringify(wishlist));
-            if (currentProduct) openProductDetails(currentProduct.id);
-            else renderProducts(PRODUCTS);
+
+            // Update homepage cards
+            renderProducts(PRODUCTS);
+
+            // Update modal button if open
+            if (currentProduct && currentProduct.id === productId) {
+                const wishlistBtnIcon = document.querySelector('#detailWishlistBtn i');
+                if (wishlist.includes(productId)) {
+                    wishlistBtnIcon.className = 'fas fa-heart text-red-500';
+                    showNotification('Added to Wishlist!');
+                } else {
+                    wishlistBtnIcon.className = 'far fa-heart';
+                    showNotification('Removed from Wishlist');
+                }
+            }
         }
 
         function renderRecentlyViewed() {
@@ -615,7 +610,7 @@
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-3 cursor-pointer hover:shadow-md transition" onclick="openProductDetails(${p.id})">
                     <img src="${p.images ? p.images[0] : p.image}" class="w-full h-20 object-cover rounded mb-2">
                     <p class="font-bold text-xs text-gray-800 dark:text-white line-clamp-2">${p.name}</p>
-                    <p class="text-blue-600 dark:text-blue-400 font-bold text-sm">${p.price}</p>
+                    <p class="text-blue-600 dark:text-blue-400 font-bold text-sm">₹${p.price}</p>
                 </div>
             `).join('');
         }
@@ -646,7 +641,7 @@
             const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             document.getElementById('cartCount').textContent = totalItems;
             document.getElementById('cartCountModal').textContent = totalItems;
-            document.getElementById('cartTotal').textContent = `${totalPrice.toLocaleString()}`;
+            document.getElementById('cartTotal').textContent = `₹${totalPrice.toLocaleString()}`;
             
             const cartItems = document.getElementById('cartItems');
             if (cart.length === 0) {
