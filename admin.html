@@ -16,7 +16,6 @@
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
-                <!-- Pure Company Logo, No Fallback Icons -->
                 <div class="logo-circle mx-auto mb-4 bg-blue-900 flex items-center justify-center">
                     <img src="logo.png" class="w-full h-full object-cover">
                 </div>
@@ -68,20 +67,37 @@
                         <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label><textarea id="pDescription" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea></div>
                         <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Specifications</label><textarea id="pSpecifications" rows="4" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none font-mono text-sm"></textarea></div>
                         
-                        <!-- NEW OPTIONAL REVIEW & RATING FIELDS -->
+                        <!-- UPDATED REVIEW & RATING SECTION -->
                         <div class="border-t pt-4 mt-4">
                             <h3 class="font-bold text-gray-700 dark:text-gray-300 mb-3"><i class="fas fa-star text-yellow-500 mr-2"></i>Featured Review (Optional)</h3>
-                            <div class="grid grid-cols-2 gap-4 mb-2">
-                                <input type="text" id="pReviewName" placeholder="Reviewer Name" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
-                                <select id="pReviewRating" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
-                                    <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
-                                    <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
-                                    <option value="3">⭐⭐⭐ (3 Stars)</option>
-                                    <option value="2">⭐⭐ (2 Stars)</option>
-                                    <option value="1">⭐ (1 Star)</option>
-                                </select>
+                            
+                            <div class="mb-2">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Reviewer Name</label>
+                                <input type="text" id="pReviewName" placeholder="e.g., Happy Customer" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
                             </div>
-                            <textarea id="pReviewComment" placeholder="Review Comment" rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Type Exact Rating (e.g., 4.1)</label>
+                                    <input type="text" id="pReviewRating" placeholder="4.1" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Or Select from Dropdown (3.2 to 4.9)</label>
+                                    <select id="ratingDropdown" onchange="document.getElementById('pReviewRating').value = this.value" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
+                                        <option value="">-- Select Rating --</option>
+                                        <option value="3.2">3.2</option><option value="3.3">3.3</option><option value="3.4">3.4</option><option value="3.5">3.5</option>
+                                        <option value="3.6">3.6</option><option value="3.7">3.7</option><option value="3.8">3.8</option><option value="3.9">3.9</option>
+                                        <option value="4.0">4.0</option><option value="4.1">4.1</option><option value="4.2">4.2</option><option value="4.3">4.3</option>
+                                        <option value="4.4">4.4</option><option value="4.5">4.5</option><option value="4.6">4.6</option><option value="4.7">4.7</option>
+                                        <option value="4.8">4.8</option><option value="4.9">4.9</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Review Comment</label>
+                                <textarea id="pReviewComment" placeholder="Write review here..." rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea>
+                            </div>
                         </div>
 
                         <div class="flex gap-3 pt-4">
@@ -119,7 +135,7 @@
             
             const reviewName = document.getElementById('pReviewName').value;
             const reviewComment = document.getElementById('pReviewComment').value;
-            const reviewRating = parseInt(document.getElementById('pReviewRating').value);
+            const reviewRating = document.getElementById('pReviewRating').value; // Now takes text input
 
             const product = {
                 id, name: document.getElementById('pName').value, category: document.getElementById('pCategory').value,
@@ -129,8 +145,12 @@
                 description: document.getElementById('pDescription').value, specifications: document.getElementById('pSpecifications').value
             };
 
-            if (reviewName || reviewComment) {
-                product.featuredReview = { name: reviewName || 'Customer', comment: reviewComment || '', rating: reviewRating };
+            if (reviewName || reviewComment || reviewRating) {
+                product.featuredReview = { 
+                    name: reviewName || 'Customer', 
+                    comment: reviewComment || '', 
+                    rating: reviewRating || '5.0' 
+                };
             }
 
             if (idx !== -1) adminProducts[idx] = product; else adminProducts.push(product);
@@ -160,11 +180,13 @@
             if (p.featuredReview) {
                 document.getElementById('pReviewName').value = p.featuredReview.name || '';
                 document.getElementById('pReviewComment').value = p.featuredReview.comment || '';
-                document.getElementById('pReviewRating').value = p.featuredReview.rating || 5;
+                document.getElementById('pReviewRating').value = p.featuredReview.rating || '';
+                document.getElementById('ratingDropdown').value = p.featuredReview.rating || '';
             } else {
                 document.getElementById('pReviewName').value = '';
                 document.getElementById('pReviewComment').value = '';
-                document.getElementById('pReviewRating').value = 5;
+                document.getElementById('pReviewRating').value = '';
+                document.getElementById('ratingDropdown').value = '';
             }
 
             document.getElementById('pImages').dispatchEvent(new Event('input'));
@@ -179,7 +201,8 @@
             document.getElementById('imagePreviewContainer').innerHTML = ''; 
             document.getElementById('pReviewName').value = '';
             document.getElementById('pReviewComment').value = '';
-            document.getElementById('pReviewRating').value = 5;
+            document.getElementById('pReviewRating').value = '';
+            document.getElementById('ratingDropdown').value = '';
         }
         
         function generateCode() {
