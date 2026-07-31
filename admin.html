@@ -5,16 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - JugadTeck</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: { extend: { colors: { primary: '#1e40af', secondary: '#0ea5e9' } } }
-        }
-    </script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .preview-img { max-height: 100px; object-fit: contain; }
-        .logo-circle { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 3px solid white; background: white; }
+        .logo-circle { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 3px solid white; background: white; cursor: pointer; }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
@@ -23,34 +17,31 @@
         <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="logo-circle mx-auto mb-4 bg-blue-900 flex items-center justify-center">
-                    <img src="logo.png" alt="JugadTeck" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-3xl font-bold text-blue-900\'>JT</span>'">
+                    <img src="logo.png" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-2xl font-bold text-blue-900\'>JT</span>'">
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Admin Login</h2>
-                <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Enter password to access admin panel</p>
             </div>
-            <div class="space-y-4">
-                <input type="password" id="adminPassword" placeholder="Enter Password" class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none transition">
-                <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"><i class="fas fa-sign-in-alt mr-2"></i>Login</button>
-            </div>
+            <input type="password" id="adminPassword" placeholder="Enter Password" class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg mb-4 outline-none">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">Login</button>
         </div>
     </div>
 
     <div id="adminDashboard" class="hidden">
         <header class="bg-blue-900 dark:bg-gray-800 text-white shadow-lg">
-            <div class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <!-- Logo Click navigates to Product Form -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="document.getElementById('productForm').scrollIntoView({behavior: 'smooth'})">
                     <div class="logo-circle bg-white flex items-center justify-center">
-                        <img src="logo.png" alt="JugadTeck" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-2xl font-bold text-blue-900\'>JT</span>'">
+                        <img src="logo.png" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xl font-bold text-blue-900\'>JT</span>'">
                     </div>
                     <div>
                         <h1 class="text-xl font-bold">Admin Dashboard</h1>
-                        <p class="text-xs text-blue-200">JugadTeck Management</p>
+                        <p class="text-xs text-blue-200">Click logo to add products</p>
                     </div>
                 </div>
-                <div class="flex gap-3 flex-wrap">
-                    <button onclick="toggleDarkMode()" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm"><i class="fas fa-moon mr-2"></i>Theme</button>
-                    <a href="index.html" target="_blank" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm"><i class="fas fa-external-link-alt mr-2"></i>View Site</a>
-                    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 transition text-sm"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+                <div class="flex gap-3">
+                    <a href="index.html" target="_blank" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-600 text-sm"><i class="fas fa-external-link-alt mr-2"></i>View Site</a>
+                    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 text-sm"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
                 </div>
             </div>
         </header>
@@ -61,171 +52,97 @@
                     <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white" id="formTitle"><i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add New Product</h2>
                     <form id="productForm" class="space-y-4">
                         <input type="hidden" id="productId">
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product ID</label><input type="number" id="pId" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product Name</label><input type="text" id="pName" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product ID</label><input type="number" id="pId" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product Name</label><input type="text" id="pName" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
                         <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-                            <select id="pCategory" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none">
-                                <option value="">Select Category</option>
-                                <option value="Arduino">Arduino</option><option value="ESP32">ESP32</option><option value="Sensors">Sensors</option>
-                                <option value="Modules">Modules</option><option value="Raspberry Pi">Raspberry Pi</option><option value="Robotics">Robotics</option>
-                                <option value="IoT">IoT</option><option value="Project Kit">Project Kit</option><option value="Projects">Projects</option>
+                            <select id="pCategory" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
+                                <option value="">Select</option><option value="Arduino">Arduino</option><option value="ESP32">ESP32</option><option value="Sensors">Sensors</option>
+                                <option value="Modules">Modules</option><option value="Raspberry Pi">Raspberry Pi</option><option value="Project Kit">Project Kit</option><option value="Projects">Projects</option>
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (₹)</label><input type="number" id="pPrice" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none"></div>
-                            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Original Price (₹)</label><input type="number" id="pOriginalPrice" placeholder="For discount" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none"></div>
+                            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (₹)</label><input type="number" id="pPrice" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
+                            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Original Price</label><input type="number" id="pOriginalPrice" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
                         </div>
-                        
-                        <!-- Multiple Images Input -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image URLs (Separate multiple links with comma)</label>
-                            <textarea id="pImages" required rows="2" placeholder="https://img1.jpg, https://img2.jpg, https://img3.jpg" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none font-mono text-sm"></textarea>
-                            <div id="imagePreviewContainer" class="flex gap-2 mt-2 overflow-x-auto"></div>
-                        </div>
-
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label><textarea id="pDescription" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none"></textarea></div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Specifications (Use bullet • and new lines)</label>
-                            <textarea id="pSpecifications" rows="4" placeholder="• Microcontroller: ATmega328P&#10;• Operating Voltage: 5V" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-blue-600 outline-none font-mono text-sm"></textarea>
-                        </div>
-
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image URLs (Comma separated)</label><textarea id="pImages" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none font-mono text-sm"></textarea><div id="imagePreviewContainer" class="flex gap-2 mt-2 overflow-x-auto"></div></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label><textarea id="pDescription" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Specifications</label><textarea id="pSpecifications" rows="4" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none font-mono text-sm"></textarea></div>
                         <div class="flex gap-3 pt-4">
-                            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"><i class="fas fa-save mr-2"></i>Save Product</button>
-                            <button type="button" onclick="resetForm()" class="px-6 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white py-3 rounded-lg font-bold hover:bg-gray-400 transition"><i class="fas fa-undo"></i> Clear</button>
+                            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"><i class="fas fa-save mr-2"></i>Save</button>
+                            <button type="button" onclick="resetForm()" class="px-6 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white py-3 rounded-lg font-bold"><i class="fas fa-undo"></i></button>
                         </div>
                     </form>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white"><i class="fas fa-list text-blue-600 mr-2"></i>Current Products</h2>
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white"><i class="fas fa-list text-blue-600 mr-2"></i>Products</h2>
                     <div id="productsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2"></div>
                 </div>
             </div>
 
             <div class="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-xl p-6">
-                <h3 class="text-xl font-bold text-yellow-800 dark:text-yellow-400 mb-4"><i class="fas fa-info-circle mr-2"></i>How to Update Website</h3>
-                <ol class="space-y-3 text-gray-700 dark:text-gray-300 text-sm md:text-base mb-6">
-                    <li class="flex items-start"><span class="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">1</span><span>Add/Edit products above.</span></li>
-                    <li class="flex items-start"><span class="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">2</span><span>Click "Generate Update Code & Copy".</span></li>
-                    <li class="flex items-start"><span class="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">3</span><span>Go to GitHub -> Open products.js -> Edit -> Paste code -> Commit changes.</span></li>
-                </ol>
-                <button onclick="generateCode()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition text-lg"><i class="fas fa-code mr-2"></i>Generate Update Code & Copy</button>
+                <h3 class="text-xl font-bold text-yellow-800 dark:text-yellow-400 mb-4"><i class="fas fa-info-circle mr-2"></i>Update Website</h3>
+                <button onclick="generateCode()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 text-lg"><i class="fas fa-code mr-2"></i>Generate Code & Copy</button>
                 <textarea id="generatedCode" readonly class="mt-4 w-full h-40 p-4 bg-gray-800 text-green-400 font-mono text-xs rounded-lg hidden"></textarea>
             </div>
         </div>
     </div>
 
     <script>
-        const defaultProducts = [
-            { id: 1, name: "Arduino Uno R3", category: "Arduino", price: 450, originalPrice: 550, discount: true, images: ["https://images.unsplash.com/photo-1553406830-ef2513450d76?auto=format&fit=crop&w=500&q=80"], description: "Classic board.", specifications: "• MCU: ATmega328P\n• Voltage: 5V" }
-        ];
-        let adminProducts = JSON.parse(localStorage.getItem('jugadteck_admin_products')) || [...defaultProducts];
+        let adminProducts = JSON.parse(localStorage.getItem('jugadteck_admin_products')) || [];
         let adminPassword = 'singh@12345678';
 
-        // Dark Mode
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('admin_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        }
-        if (localStorage.getItem('admin_theme') === 'dark') document.documentElement.classList.add('dark');
-
-        function login() {
-            if (document.getElementById('adminPassword').value === adminPassword) {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                renderProductsList();
-            } else { alert('Incorrect password!'); }
-        }
+        function login() { if (document.getElementById('adminPassword').value === adminPassword) { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('adminDashboard').classList.remove('hidden'); renderProductsList(); } else alert('Wrong password!'); }
         function logout() { location.reload(); }
 
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = parseInt(document.getElementById('pId').value);
-            const existingIndex = adminProducts.findIndex(p => p.id === id);
-            
-            // Convert comma separated images to array
-            const imagesRaw = document.getElementById('pImages').value;
-            const images = imagesRaw.split(',').map(url => url.trim()).filter(url => url);
-
+            const idx = adminProducts.findIndex(p => p.id === id);
             const product = {
-                id: id, name: document.getElementById('pName').value, category: document.getElementById('pCategory').value,
+                id, name: document.getElementById('pName').value, category: document.getElementById('pCategory').value,
                 price: parseFloat(document.getElementById('pPrice').value), originalPrice: parseFloat(document.getElementById('pOriginalPrice').value) || null,
-                discount: document.getElementById('pOriginalPrice').value ? true : false, 
-                images: images,
+                discount: document.getElementById('pOriginalPrice').value ? true : false,
+                images: document.getElementById('pImages').value.split(',').map(u => u.trim()).filter(u => u),
                 description: document.getElementById('pDescription').value, specifications: document.getElementById('pSpecifications').value
             };
-            if (existingIndex !== -1) adminProducts[existingIndex] = product;
-            else adminProducts.push(product);
+            if (idx !== -1) adminProducts[idx] = product; else adminProducts.push(product);
             localStorage.setItem('jugadteck_admin_products', JSON.stringify(adminProducts));
-            resetForm(); renderProductsList(); showNotification('Product saved!');
+            resetForm(); renderProductsList(); alert('Product Saved!');
         });
 
-        // Image Preview
         document.getElementById('pImages').addEventListener('input', function() {
-            const urls = this.value.split(',').map(url => url.trim()).filter(url => url);
-            const container = document.getElementById('imagePreviewContainer');
-            container.innerHTML = urls.map(url => `<img src="${url}" class="h-16 w-16 object-cover rounded border dark:border-gray-600">`).join('');
+            document.getElementById('imagePreviewContainer').innerHTML = this.value.split(',').map(u => u.trim()).filter(u => u).map(url => `<img src="${url}" class="h-16 w-16 object-cover rounded border dark:border-gray-600">`).join('');
         });
 
         function renderProductsList() {
-            const container = document.getElementById('productsList');
-            if (adminProducts.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 py-8">No products</p>'; return; }
-            container.innerHTML = adminProducts.map(p => `
-                <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 transition">
+            document.getElementById('productsList').innerHTML = adminProducts.map(p => `
+                <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border dark:border-gray-600">
                     <img src="${p.images ? p.images[0] : ''}" class="w-16 h-16 object-cover rounded border dark:border-gray-600">
-                    <div class="flex-1 min-w-0"><h4 class="font-bold text-gray-800 dark:text-white truncate">${p.name}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.category}</p><p class="text-blue-600 dark:text-blue-400 font-bold">${p.price}</p></div>
-                    <div class="flex gap-2 flex-shrink-0">
-                        <button onclick="editProduct(${p.id})" class="bg-blue-500 text-white w-8 h-8 rounded hover:bg-blue-600 flex items-center justify-center"><i class="fas fa-edit text-xs"></i></button>
-                        <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white w-8 h-8 rounded hover:bg-red-600 flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
-                    </div>
+                    <div class="flex-1 min-w-0"><h4 class="font-bold text-gray-800 dark:text-white truncate">${p.name}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.category} - ₹${p.price}</p></div>
+                    <div class="flex gap-2"><button onclick="editProduct(${p.id})" class="bg-blue-500 text-white w-8 h-8 rounded flex items-center justify-center"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white w-8 h-8 rounded flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button></div>
                 </div>`).join('');
         }
 
         function editProduct(id) {
-            const p = adminProducts.find(item => item.id === id);
-            if (!p) return;
-            document.getElementById('productId').value = p.id; document.getElementById('pId').value = p.id;
-            document.getElementById('pName').value = p.name; document.getElementById('pCategory').value = p.category;
+            const p = adminProducts.find(x => x.id === id);
+            document.getElementById('pId').value = p.id; document.getElementById('pName').value = p.name; document.getElementById('pCategory').value = p.category;
             document.getElementById('pPrice').value = p.price; document.getElementById('pOriginalPrice').value = p.originalPrice || '';
-            document.getElementById('pImages').value = p.images ? p.images.join(', ') : '';
-            document.getElementById('pDescription').value = p.description; document.getElementById('pSpecifications').value = p.specifications || '';
-            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit text-blue-600 mr-2"></i>Edit Product';
-            
-            // Trigger preview
+            document.getElementById('pImages').value = p.images ? p.images.join(', ') : ''; document.getElementById('pDescription').value = p.description; document.getElementById('pSpecifications').value = p.specifications || '';
             document.getElementById('pImages').dispatchEvent(new Event('input'));
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit text-blue-600 mr-2"></i>Edit Product';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function deleteProduct(id) {
-            if (confirm('Delete this product?')) {
-                adminProducts = adminProducts.filter(p => p.id !== id);
-                localStorage.setItem('jugadteck_admin_products', JSON.stringify(adminProducts));
-                renderProductsList();
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('productForm').reset(); document.getElementById('productId').value = '';
-            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add New Product';
-            document.getElementById('imagePreviewContainer').innerHTML = '';
-        }
-
+        function deleteProduct(id) { if(confirm('Delete?')) { adminProducts = adminProducts.filter(p => p.id !== id); localStorage.setItem('jugadteck_admin_products', JSON.stringify(adminProducts)); renderProductsList(); } }
+        function resetForm() { document.getElementById('productForm').reset(); document.getElementById('productId').value = ''; document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add New Product'; document.getElementById('imagePreviewContainer').innerHTML = ''; }
+        
         function generateCode() {
             const code = `const PRODUCTS = ${JSON.stringify(adminProducts, null, 4)};`;
-            const textarea = document.getElementById('generatedCode');
-            textarea.value = code; textarea.classList.remove('hidden'); textarea.select(); document.execCommand('copy');
-            showNotification('Code copied! Update products.js on GitHub.');
-            setTimeout(() => alert('Code copied!\n\nGo to GitHub -> products.js -> Edit -> Paste -> Commit changes.'), 500);
+            const ta = document.getElementById('generatedCode'); ta.value = code; ta.classList.remove('hidden'); ta.select(); document.execCommand('copy');
+            alert('Code copied! Go to GitHub -> products.js -> Edit -> Paste -> Commit changes.');
         }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-            notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
-            document.body.appendChild(notification); setTimeout(() => notification.remove(), 3000);
-        }
-        document.getElementById('adminPassword').addEventListener('keypress', function(e) { if (e.key === 'Enter') login(); });
+        document.getElementById('adminPassword').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
     </script>
 </body>
 </html>
