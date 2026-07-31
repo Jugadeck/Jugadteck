@@ -46,22 +46,54 @@
         .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s; }
-        .scrollable-content { max-height: 150px; overflow-y: auto; padding-right: 10px; }
+        
+        /* FIX 5: 9 lines ke liye max-height badhaya (pehle 150px tha, ab 220px) */
+        .scrollable-content { max-height: 220px; overflow-y: auto; padding-right: 10px; }
         .scrollable-content::-webkit-scrollbar { width: 6px; }
         .scrollable-content::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .scrollable-content::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        
+        /* FIX 1: Mobile par buttons fixed nahi, normal flow mein */
         .sticky-buy-section { position: sticky; top: 20px; }
-        @media (max-width: 768px) { .sticky-buy-section { position: fixed; bottom: 0; left: 0; right: 0; top: auto; background: white; padding: 12px; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 30; } }
+        @media (max-width: 768px) {
+            .sticky-buy-section {
+                position: relative; /* Fixed hata diya, ab scroll hoga */
+                bottom: auto;
+                left: auto;
+                right: auto;
+                top: auto;
+                background: transparent;
+                padding: 0;
+                box-shadow: none;
+                z-index: auto;
+                margin-top: 20px;
+            }
+        }
+        
         .floating-whatsapp { position: fixed; bottom: 100px; right: 20px; z-index: 40; animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
         .wishlist-btn { position: absolute; top: 10px; right: 10px; z-index: 10; }
         .wishlist-btn.active { color: #ef4444; }
+        
+        /* FIX 3: Dark mode mein specs table fix */
         .specs-table { width: 100%; }
         .specs-table tr { border-bottom: 1px solid #e5e7eb; }
+        .dark .specs-table tr { border-bottom-color: #374151; }
         .specs-table tr:last-child { border-bottom: none; }
         .specs-table td { padding: 10px 12px; vertical-align: top; }
-        .specs-table td:first-child { font-weight: 600; color: #374151; width: 40%; background: #f9fafb; }
+        .specs-table td:first-child { 
+            font-weight: 600; 
+            color: #374151; 
+            width: 40%;
+            background: #f9fafb;
+        }
+        .dark .specs-table td:first-child {
+            background: #1f2937; /* Dark mode mein dark gray */
+            color: #e5e7eb; /* Light text */
+        }
         .specs-table td:last-child { color: #6b7280; }
+        .dark .specs-table td:last-child { color: #d1d5db; }
+        .dark .specs-table { color: #e5e7eb; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -129,7 +161,6 @@
         </div>
 
         <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Skeleton Loading -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden"><div class="h-64 skeleton"></div><div class="p-5 space-y-3"><div class="h-4 skeleton rounded"></div><div class="h-4 skeleton rounded w-2/3"></div><div class="h-8 skeleton rounded"></div></div></div>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden"><div class="h-64 skeleton"></div><div class="p-5 space-y-3"><div class="h-4 skeleton rounded"></div><div class="h-4 skeleton rounded w-2/3"></div><div class="h-8 skeleton rounded"></div></div></div>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden"><div class="h-64 skeleton"></div><div class="p-5 space-y-3"><div class="h-4 skeleton rounded"></div><div class="h-4 skeleton rounded w-2/3"></div><div class="h-8 skeleton rounded"></div></div></div>
@@ -215,7 +246,7 @@
                         <span class="text-gray-400">|</span>
                         <span class="text-green-600 text-sm font-medium"><i class="fas fa-check-circle mr-1"></i>In Stock</span>
                     </div>
-                    <div class="border-t border-b py-4 mb-6">
+                    <div class="border-t border-b py-4 mb-6 dark:border-gray-700">
                         <div class="flex items-baseline gap-3 flex-wrap">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Price:</span>
                             <span class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white" id="detailPrice"></span>
@@ -240,16 +271,16 @@
                     </div>
                     <div class="tab-content" id="tab-specifications">
                         <h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">Product Specifications</h3>
-                        <div class="scrollable-content bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border" id="detailSpecifications"></div>
+                        <div class="scrollable-content bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700" id="detailSpecifications"></div>
                     </div>
                     <div class="tab-content" id="tab-reviews">
                         <h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">Customer Reviews</h3>
                         <div class="scrollable-content space-y-4">
-                            <div class="border-b pb-3">
+                            <div class="border-b pb-3 dark:border-gray-700">
                                 <div class="flex items-center gap-2 mb-1"><span class="font-bold text-gray-800 dark:text-white">Rahul S.</span><span class="text-yellow-500"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span></div>
                                 <p class="text-gray-600 dark:text-gray-300 text-sm">Excellent product! Fast delivery and great quality.</p>
                             </div>
-                            <div class="border-b pb-3">
+                            <div class="border-b pb-3 dark:border-gray-700">
                                 <div class="flex items-center gap-2 mb-1"><span class="font-bold text-gray-800 dark:text-white">Priya K.</span><span class="text-yellow-500"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span></div>
                                 <p class="text-gray-600 dark:text-gray-300 text-sm">Good value for money. Works perfectly with my Arduino projects.</p>
                             </div>
@@ -260,7 +291,7 @@
                         </div>
                     </div>
 
-                    <!-- STICKY BUY SECTION -->
+                    <!-- STICKY BUY SECTION - FIX 1: Mobile par ab scroll hoga -->
                     <div class="sticky-buy-section mt-6">
                         <div class="flex flex-col sm:flex-row gap-4">
                             <button onclick="buyNowWhatsApp()" class="flex-1 bg-yellow-500 text-gray-900 py-3 rounded-lg font-bold hover:bg-yellow-400 transition flex items-center justify-center gap-2 text-lg shadow-md">
@@ -292,7 +323,7 @@
         <div class="border-t p-4 bg-gray-50 dark:bg-gray-700">
             <div class="flex justify-between items-center mb-4">
                 <span class="text-lg font-semibold dark:text-white">Total Amount:</span>
-                <span id="cartTotal" class="text-2xl font-bold text-blue-600">₹0</span>
+                <span id="cartTotal" class="text-2xl font-bold text-blue-600">0</span>
             </div>
             <button onclick="checkoutWhatsApp()" class="w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition flex items-center justify-center gap-2 text-lg">
                 <i class="fab fa-whatsapp text-2xl"></i> Order on WhatsApp
@@ -356,6 +387,16 @@
             document.documentElement.classList.add('dark');
         }
 
+        // FIX 4: Exit Confirmation - Jab user website se bahar jaane ki koshish kare
+        window.addEventListener('beforeunload', function (e) {
+            // Sirf tab confirmation dikhao jab user actively kuch kar raha ho
+            if (cart.length > 0) {
+                e.preventDefault();
+                e.returnValue = 'Aapke cart mein items hain. Kya aap sach mein jaana chahte hain?';
+                return e.returnValue;
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { renderProducts(PRODUCTS); updateCartUI(); }, 1000);
             renderRecentlyViewed();
@@ -398,11 +439,14 @@
             `).join('');
         }
 
+        // FIX 2: History API - Back button se website se bahar na nikle
         function openProductDetails(id) {
             currentProduct = PRODUCTS.find(p => p.id === id);
             if (!currentProduct) return;
             
-            // Add to recently viewed
+            // Browser history mein entry add karo
+            history.pushState({ productOpen: true }, '', '#product-' + id);
+            
             if (!recentlyViewed.includes(id)) {
                 recentlyViewed.unshift(id);
                 if (recentlyViewed.length > 4) recentlyViewed.pop();
@@ -430,7 +474,6 @@
                 discountEl.style.display = 'none';
             }
 
-            // Specifications
             const specsEl = document.getElementById('detailSpecifications');
             if (currentProduct.specifications) {
                 const specs = currentProduct.specifications.split('\n').filter(s => s.trim());
@@ -444,7 +487,6 @@
                 specsEl.parentElement.style.display = 'none';
             }
 
-            // Thumbnails
             const thumbContainer = document.getElementById('thumbnailContainer');
             thumbContainer.innerHTML = images.map((img, idx) => `
                 <div class="thumbnail ${idx === 0 ? 'active' : ''}" onclick="changeImage('${img}', this)">
@@ -452,10 +494,8 @@
                 </div>
             `).join('');
 
-            // Setup zoom
             setupImageZoom();
 
-            // Related products
             const related = PRODUCTS.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id).slice(0, 3);
             document.getElementById('relatedProductsGrid').innerHTML = related.map(p => `
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-3 cursor-pointer hover:shadow-md transition" onclick="openProductDetails(${p.id})">
@@ -469,6 +509,14 @@
             document.body.style.overflow = 'hidden';
             switchTab('description');
         }
+
+        // FIX 2: Back button handle karna
+        window.addEventListener('popstate', function(event) {
+            // Agar product modal open hai, to band karo
+            if (document.getElementById('productDetailsModal').classList.contains('active')) {
+                closeProductDetails();
+            }
+        });
 
         function changeImage(src, thumbEl) {
             document.getElementById('detailImage').src = src;
@@ -517,6 +565,10 @@
             document.getElementById('productDetailsModal').classList.remove('active');
             document.body.style.overflow = 'auto';
             currentProduct = null;
+            // History se entry hatao
+            if (window.location.hash.startsWith('#product-')) {
+                history.back();
+            }
         }
 
         function switchTab(tabName) {
