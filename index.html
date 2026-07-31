@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JugadTeck - From Concept to Circuit</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#1e40af' } } } }
-    </script>
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#1e40af' } } } }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; }
@@ -48,8 +46,6 @@
         .specs-table td:first-child { font-weight: 600; color: #374151; width: 40%; background: #f9fafb; }
         .dark .specs-table td:first-child { background: #1f2937; color: #e5e7eb; }
         .dark .specs-table td:last-child { color: #d1d5db; }
-        .star-rating i { cursor: pointer; color: #d1d5db; transition: color 0.2s; }
-        .star-rating i.active, .star-rating i:hover { color: #fbbf24; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -75,7 +71,8 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <button onclick="toggleDarkMode()" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition"><i class="fas fa-moon dark:hidden text-xl"></i><i class="fas fa-sun hidden dark:inline text-xl"></i></button>
-                    <a href="admin.html" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition"><i class="fas fa-user-shield text-xl"></i></a>
+                    <!-- RESTORED ADMIN SHIELD ICON -->
+                    <a href="admin.html" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition" title="Admin Login"><i class="fas fa-user-shield text-xl"></i></a>
                     <button onclick="toggleCart()" class="relative bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">
                         <i class="fas fa-shopping-cart mr-2"></i><span class="hidden md:inline">Cart</span>
                         <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">0</span>
@@ -121,7 +118,7 @@
         </div>
     </section>
 
-    <!-- PRODUCT DETAILS MODAL -->
+    <!-- PRODUCT DETAILS MODAL (REVIEWS REMOVED) -->
     <div id="productDetailsModal" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-y-auto">
         <div class="sticky top-0 bg-white dark:bg-gray-800 border-b shadow-sm z-10">
             <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-7xl">
@@ -152,9 +149,6 @@
                     </div>
                     <h1 id="detailTitle" class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white leading-tight mb-3"></h1>
                     <div class="flex items-center gap-3 mb-4 flex-wrap">
-                        <span class="bg-green-600 text-white text-sm px-2 py-1 rounded flex items-center gap-1 font-bold">4.5 <i class="fas fa-star text-xs"></i></span>
-                        <span class="text-blue-600 font-medium text-sm" id="reviewCountText">0 Reviews</span>
-                        <span class="text-gray-400">|</span>
                         <span class="text-green-600 text-sm font-medium"><i class="fas fa-check-circle mr-1"></i>In Stock</span>
                     </div>
                     
@@ -183,12 +177,11 @@
                         <button onclick="addToCartFromDetails()" class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2 text-lg shadow-md"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                     </div>
 
-                    <!-- TABS -->
+                    <!-- TABS (Only Description & Specs) -->
                     <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
                         <div class="flex gap-2 overflow-x-auto">
                             <button class="tab-btn active" onclick="switchTab('description', this)">Description</button>
                             <button class="tab-btn" onclick="switchTab('specifications', this)">Specifications</button>
-                            <button class="tab-btn" onclick="switchTab('reviews', this)">Reviews</button>
                         </div>
                     </div>
 
@@ -199,26 +192,6 @@
                     <div class="tab-content" id="tab-specifications">
                         <h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">Product Specifications</h3>
                         <div class="scrollable-content bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700" id="detailSpecifications"></div>
-                    </div>
-                    <div class="tab-content" id="tab-reviews">
-                        <h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">Customer Reviews</h3>
-                        
-                        <!-- Review Form -->
-                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700 mb-6">
-                            <h4 class="font-bold mb-3 text-gray-800 dark:text-white">Write a Review</h4>
-                            <input type="text" id="reviewName" placeholder="Your Name (Optional)" class="w-full mb-3 px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            <div class="flex items-center gap-2 mb-3">
-                                <span class="text-gray-700 dark:text-gray-300">Rating:</span>
-                                <div class="star-rating text-2xl" id="starRating">
-                                    <i class="fas fa-star" data-val="1"></i><i class="fas fa-star" data-val="2"></i><i class="fas fa-star" data-val="3"></i><i class="fas fa-star" data-val="4"></i><i class="fas fa-star" data-val="5"></i>
-                                </div>
-                            </div>
-                            <textarea id="reviewComment" placeholder="Your Review (Optional)" rows="3" class="w-full mb-3 px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
-                            <button onclick="submitReview()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Submit Review</button>
-                        </div>
-
-                        <!-- Reviews List -->
-                        <div id="reviewsList" class="scrollable-content space-y-4"></div>
                     </div>
                 </div>
             </div>
@@ -232,7 +205,6 @@
             <button onclick="toggleCart()" class="text-2xl"><i class="fas fa-times"></i></button>
         </div>
         
-        <!-- Cart Delivery Progress -->
         <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border-b dark:border-gray-700">
             <div class="flex justify-between items-center mb-2">
                 <span class="text-sm font-bold text-blue-800 dark:text-blue-300"><i class="fas fa-truck mr-2"></i>Free Delivery</span>
@@ -255,7 +227,7 @@
             </div>
             <div class="flex justify-between items-center mb-4 text-lg border-t pt-2 dark:border-gray-600">
                 <span class="font-bold dark:text-white">Total Amount:</span>
-                <span id="cartTotal" class="font-bold text-blue-600 text-xl">₹0</span>
+                <span id="cartTotal" class="font-bold text-blue-600 text-xl">0</span>
             </div>
             <button onclick="checkoutWhatsApp()" class="w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition flex items-center justify-center gap-2 text-lg"><i class="fab fa-whatsapp text-2xl"></i> Order on WhatsApp</button>
         </div>
@@ -273,16 +245,12 @@
     <script>
         let cart = JSON.parse(localStorage.getItem('jugadteck_cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('jugadteck_wishlist')) || [];
-        let reviews = JSON.parse(localStorage.getItem('jugadteck_reviews')) || {};
         let currentProduct = null;
         let currentImageIndex = 0;
-        let selectedRating = 0;
 
-        // Dark Mode
         function toggleDarkMode() { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
         if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
 
-        // Exit Prompt
         window.addEventListener('beforeunload', function (e) { if (cart.length > 0) { e.preventDefault(); e.returnValue = 'Aapke cart mein items hain. Kya aap sach mein jaana chahte hain?'; } });
         window.addEventListener('popstate', function() { if (document.getElementById('productDetailsModal').classList.contains('active')) closeProductDetails(); });
 
@@ -292,7 +260,6 @@
                 const term = e.target.value.toLowerCase();
                 renderProducts(PRODUCTS.filter(p => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term)));
             });
-            setupStarRating();
         });
 
         function renderProducts(products) {
@@ -337,7 +304,6 @@
                 discEl.textContent = `${Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100)}% off`; discEl.style.display = 'inline';
             } else { origEl.style.display = 'none'; discEl.style.display = 'none'; }
 
-            // Specs
             const specsEl = document.getElementById('detailSpecifications');
             if (currentProduct.specifications) {
                 specsEl.innerHTML = '<table class="specs-table">' + currentProduct.specifications.split('\n').filter(s=>s.trim()).map(spec => {
@@ -346,12 +312,10 @@
                 }).join('') + '</table>';
             }
 
-            // Thumbnails & Swipe
             const thumbContainer = document.getElementById('thumbnailContainer');
             thumbContainer.innerHTML = images.map((img, idx) => `<div class="thumbnail ${idx===0?'active':''}" onclick="changeImage('${img}', ${idx}, this)"><img src="${img}"></div>`).join('');
             setupSwipe(images);
 
-            // Wishlist & Share Buttons
             const wBtn = document.getElementById('modalWishlistBtn');
             wBtn.className = `img-action-btn wishlist ${wishlist.includes(id) ? 'active' : ''}`;
             wBtn.innerHTML = `<i class="${wishlist.includes(id) ? 'fas' : 'far'} fa-heart"></i>`;
@@ -361,9 +325,6 @@
                 const msg = `Check out ${currentProduct.name} on JugadTeck! Price: ₹${currentProduct.price}. Link: ${window.location.href}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
-
-            // Reviews
-            renderReviews(id);
 
             document.getElementById('productDetailsModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -406,56 +367,6 @@
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
-        // Reviews Logic
-        function setupStarRating() {
-            const stars = document.querySelectorAll('#starRating i');
-            stars.forEach(star => {
-                star.onclick = () => {
-                    selectedRating = parseInt(star.dataset.val);
-                    stars.forEach((s, i) => s.classList.toggle('active', i < selectedRating));
-                };
-            });
-        }
-
-        function submitReview() {
-            if (!currentProduct) return;
-            const name = document.getElementById('reviewName').value || 'Anonymous';
-            const comment = document.getElementById('reviewComment').value;
-            if (!selectedRating && !comment) return alert('Please give a rating or write a comment.');
-            
-            if (!reviews[currentProduct.id]) reviews[currentProduct.id] = [];
-            reviews[currentProduct.id].unshift({ name, rating: selectedRating, comment, date: new Date().toLocaleDateString() });
-            localStorage.setItem('jugadteck_reviews', JSON.stringify(reviews));
-            
-            document.getElementById('reviewName').value = '';
-            document.getElementById('reviewComment').value = '';
-            selectedRating = 0;
-            document.querySelectorAll('#starRating i').forEach(s => s.classList.remove('active'));
-            renderReviews(currentProduct.id);
-            alert('Review submitted successfully!');
-        }
-
-        function renderReviews(id) {
-            const list = document.getElementById('reviewsList');
-            const productReviews = reviews[id] || [];
-            document.getElementById('reviewCountText').textContent = `${productReviews.length} Reviews`;
-            
-            if (productReviews.length === 0) {
-                list.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No reviews yet. Be the first to review!</p>';
-                return;
-            }
-            list.innerHTML = productReviews.map(r => `
-                <div class="border-b pb-3 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="font-bold text-gray-800 dark:text-white">${r.name}</span>
-                        <span class="text-yellow-500 text-sm">${'<i class="fas fa-star"></i>'.repeat(r.rating)}${'<i class="far fa-star"></i>'.repeat(5-r.rating)}</span>
-                    </div>
-                    ${r.comment ? `<p class="text-gray-600 dark:text-gray-300 text-sm">${r.comment}</p>` : ''}
-                    <p class="text-xs text-gray-400 mt-1">${r.date}</p>
-                </div>
-            `).join('');
-        }
-
         function toggleWishlist(id) {
             const idx = wishlist.indexOf(id);
             if (idx > -1) wishlist.splice(idx, 1); else wishlist.push(id);
@@ -468,20 +379,18 @@
             }
         }
 
-        // Cart & Delivery Logic
         function getDeliveryInfo() {
             const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
             const count = cart.reduce((sum, item) => sum + item.quantity, 0);
             const isFree = total >= 1000 || count >= 8;
             const charge = isFree ? 0 : 40;
-            
             let msg = "", progress = 0;
             if (isFree) { msg = "🎉 FREE Delivery Unlocked!"; progress = 100; }
             else {
                 const moneyLeft = 1000 - total;
                 const itemsLeft = 8 - count;
                 if (moneyLeft <= itemsLeft * 125) { msg = `Add ₹${moneyLeft} more for FREE Delivery! 🚚`; progress = (total/1000)*100; }
-                else { msg = `Add ${itemsLeft} more item(s) for FREE Shipping! 📦`; progress = (count/8)*100; }
+                else { msg = `Add ${itemsLeft} more item(s) for FREE Shipping! `; progress = (count/8)*100; }
             }
             return { charge, msg, progress, total, count };
         }
@@ -491,7 +400,6 @@
             document.getElementById('deliveryProgressBar').style.width = `${info.progress}%`;
             document.getElementById('deliveryProgressBar').className = `h-2.5 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-blue-600'}`;
             document.getElementById('deliveryStatusText').textContent = info.msg;
-            
             document.getElementById('cartDeliveryBar').style.width = `${info.progress}%`;
             document.getElementById('cartDeliveryBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-blue-600'}`;
             document.getElementById('cartDeliveryStatus').textContent = info.msg;
@@ -541,14 +449,12 @@
         }
 
         function toggleCart(open) { const s = document.getElementById('cartSidebar'); if (open === true) s.classList.add('open'); else s.classList.toggle('open'); }
-        
         function addToCartFromDetails() { if (currentProduct) { addToCart(currentProduct.id); toggleCart(true); } }
         function buyNowWhatsApp() {
             if (!currentProduct) return;
             const msg = `*NEW ORDER*%0A%0A*Product:* ${currentProduct.name}%0A*Price:* ₹${currentProduct.price}%0A%0APlease confirm.`;
             window.open(`https://wa.me/919140781523?text=${msg}`, '_blank');
         }
-
         function checkoutWhatsApp() {
             if (cart.length === 0) return alert('Cart is empty!');
             const info = getDeliveryInfo();
@@ -557,7 +463,6 @@
             msg += `%0A*Subtotal:* ₹${info.total}%0A*Delivery:* ${info.charge === 0 ? 'FREE' : '₹'+info.charge}%0A*TOTAL:* ₹${info.total + info.charge}%0A%0APlease confirm my order.`;
             window.open(`https://wa.me/919140781523?text=${msg}`, '_blank');
         }
-
         function filterProducts(cat) {
             document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-blue-600', 'text-white'); b.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300'); });
             event.target.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
