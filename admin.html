@@ -8,7 +8,7 @@
     <script>tailwind.config = { darkMode: 'class' }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .logo-circle { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 3px solid white; background: white; cursor: pointer; }
+        .logo-circle { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 3px solid white; background: white; }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
@@ -22,26 +22,27 @@
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Admin Login</h2>
             </div>
             <input type="password" id="adminPassword" placeholder="Enter Password" class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg mb-4 outline-none">
-            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">Login</button>
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"><i class="fas fa-sign-in-alt mr-2"></i>Login</button>
         </div>
     </div>
 
     <div id="adminDashboard" class="hidden">
         <header class="bg-blue-900 dark:bg-gray-800 text-white shadow-lg">
             <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-                <!-- Logo Click navigates to Product Form -->
-                <div class="flex items-center gap-3 cursor-pointer" onclick="document.getElementById('productForm').scrollIntoView({behavior: 'smooth'})">
+                <!-- LOGO IS NOW STATIC (No onclick, no cursor-pointer) -->
+                <div class="flex items-center gap-3">
                     <div class="logo-circle bg-white flex items-center justify-center">
                         <img src="logo.png" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xl font-bold text-blue-900\'>JT</span>'">
                     </div>
                     <div>
                         <h1 class="text-xl font-bold">Admin Dashboard</h1>
-                        <p class="text-xs text-blue-200">Click logo to add products</p>
+                        <p class="text-xs text-blue-200">Manage your store</p>
                     </div>
                 </div>
+                <!-- PROPER BUTTONS -->
                 <div class="flex gap-3">
-                    <a href="index.html" target="_blank" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-600 text-sm"><i class="fas fa-external-link-alt mr-2"></i>View Site</a>
-                    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 text-sm"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+                    <a href="index.html" target="_blank" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-600 text-sm flex items-center"><i class="fas fa-external-link-alt mr-2"></i>View Site</a>
+                    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 text-sm flex items-center"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
                 </div>
             </div>
         </header>
@@ -67,6 +68,14 @@
                         <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image URLs (Comma separated)</label><textarea id="pImages" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none font-mono text-sm"></textarea><div id="imagePreviewContainer" class="flex gap-2 mt-2 overflow-x-auto"></div></div>
                         <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label><textarea id="pDescription" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea></div>
                         <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Specifications</label><textarea id="pSpecifications" rows="4" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none font-mono text-sm"></textarea></div>
+                        
+                        <!-- NEW OPTIONAL REVIEW FIELDS -->
+                        <div class="border-t pt-4 mt-4">
+                            <h3 class="font-bold text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-star text-yellow-500 mr-2"></i>Featured Review (Optional)</h3>
+                            <input type="text" id="pReviewName" placeholder="Reviewer Name (e.g., Happy Customer)" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg mb-2 outline-none">
+                            <textarea id="pReviewComment" placeholder="Review Comment (e.g., Excellent product!)" rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea>
+                        </div>
+
                         <div class="flex gap-3 pt-4">
                             <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"><i class="fas fa-save mr-2"></i>Save</button>
                             <button type="button" onclick="resetForm()" class="px-6 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white py-3 rounded-lg font-bold"><i class="fas fa-undo"></i></button>
@@ -99,6 +108,10 @@
             e.preventDefault();
             const id = parseInt(document.getElementById('pId').value);
             const idx = adminProducts.findIndex(p => p.id === id);
+            
+            const reviewName = document.getElementById('pReviewName').value;
+            const reviewComment = document.getElementById('pReviewComment').value;
+
             const product = {
                 id, name: document.getElementById('pName').value, category: document.getElementById('pCategory').value,
                 price: parseFloat(document.getElementById('pPrice').value), originalPrice: parseFloat(document.getElementById('pOriginalPrice').value) || null,
@@ -106,6 +119,12 @@
                 images: document.getElementById('pImages').value.split(',').map(u => u.trim()).filter(u => u),
                 description: document.getElementById('pDescription').value, specifications: document.getElementById('pSpecifications').value
             };
+
+            // Add review if provided
+            if (reviewName || reviewComment) {
+                product.featuredReview = { name: reviewName || 'Anonymous', comment: reviewComment || '', rating: 5 };
+            }
+
             if (idx !== -1) adminProducts[idx] = product; else adminProducts.push(product);
             localStorage.setItem('jugadteck_admin_products', JSON.stringify(adminProducts));
             resetForm(); renderProductsList(); alert('Product Saved!');
@@ -129,13 +148,29 @@
             document.getElementById('pId').value = p.id; document.getElementById('pName').value = p.name; document.getElementById('pCategory').value = p.category;
             document.getElementById('pPrice').value = p.price; document.getElementById('pOriginalPrice').value = p.originalPrice || '';
             document.getElementById('pImages').value = p.images ? p.images.join(', ') : ''; document.getElementById('pDescription').value = p.description; document.getElementById('pSpecifications').value = p.specifications || '';
+            
+            // Load review data if exists
+            if (p.featuredReview) {
+                document.getElementById('pReviewName').value = p.featuredReview.name || '';
+                document.getElementById('pReviewComment').value = p.featuredReview.comment || '';
+            } else {
+                document.getElementById('pReviewName').value = '';
+                document.getElementById('pReviewComment').value = '';
+            }
+
             document.getElementById('pImages').dispatchEvent(new Event('input'));
             document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit text-blue-600 mr-2"></i>Edit Product';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function deleteProduct(id) { if(confirm('Delete?')) { adminProducts = adminProducts.filter(p => p.id !== id); localStorage.setItem('jugadteck_admin_products', JSON.stringify(adminProducts)); renderProductsList(); } }
-        function resetForm() { document.getElementById('productForm').reset(); document.getElementById('productId').value = ''; document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add New Product'; document.getElementById('imagePreviewContainer').innerHTML = ''; }
+        function resetForm() { 
+            document.getElementById('productForm').reset(); document.getElementById('productId').value = ''; 
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add New Product'; 
+            document.getElementById('imagePreviewContainer').innerHTML = ''; 
+            document.getElementById('pReviewName').value = '';
+            document.getElementById('pReviewComment').value = '';
+        }
         
         function generateCode() {
             const code = `const PRODUCTS = ${JSON.stringify(adminProducts, null, 4)};`;
