@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - JugadTeck</title>
+    <title>JugadTeck Admin & Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .logo-circle { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid white; background: white; }
+        .logo-circle { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 3px solid white; background: white; }
+        .main-tab.active { background-color: #1e40af; color: white; }
+        .sub-tab.active { border-bottom: 2px solid #1e40af; color: #1e40af; font-weight: bold; }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
 
+    <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
@@ -26,190 +29,401 @@
         </div>
     </div>
 
+    <!-- DASHBOARD -->
     <div id="adminDashboard" class="hidden">
-        <header class="bg-blue-900 dark:bg-gray-800 text-white shadow-lg">
-            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="logo-circle bg-white flex items-center justify-center" style="width: 50px; height: 50px;">
-                        <img src="logo.png" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold">Admin Dashboard</h1>
-                        <p class="text-xs text-blue-200">Manage your store</p>
-                    </div>
+        <header class="bg-blue-900 dark:bg-gray-800 text-white shadow-lg p-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="logo-circle bg-white flex items-center justify-center" style="width: 40px; height: 40px;">
+                    <img src="logo.png" class="w-full h-full object-cover">
                 </div>
-                <div class="flex gap-3">
-                    <a href="index.html" target="_blank" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-600 text-sm flex items-center"><i class="fas fa-external-link-alt mr-2"></i>View Site</a>
-                    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 text-sm flex items-center"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
-                </div>
+                <h1 class="text-xl font-bold">JugadTeck Control Center</h1>
+            </div>
+            <div class="flex gap-3">
+                <a href="index.html" target="_blank" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-600 text-sm"><i class="fas fa-external-link-alt mr-2"></i>View Site</a>
+                <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 text-sm"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
             </div>
         </header>
 
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white" id="formTitle"><i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add New Product</h2>
-                    <form id="productForm" class="space-y-4">
-                        <input type="hidden" id="productId">
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product ID</label><input type="number" id="pId" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product Name</label><input type="text" id="pName" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-                            <select id="pCategory" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
-                                <option value="">Select</option><option value="Arduino">Arduino</option><option value="ESP32">ESP32</option><option value="Sensors">Sensors</option>
-                                <option value="Modules">Modules</option><option value="Raspberry Pi">Raspberry Pi</option><option value="Project Kit">Project Kit</option><option value="Projects">Projects</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (₹)</label><input type="number" id="pPrice" required class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
-                            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Original Price</label><input type="number" id="pOriginalPrice" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></div>
-                        </div>
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image URLs (Comma separated)</label><textarea id="pImages" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none font-mono text-sm"></textarea><div id="imagePreviewContainer" class="flex gap-2 mt-2 overflow-x-auto"></div></div>
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label><textarea id="pDescription" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea></div>
-                        <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Specifications</label><textarea id="pSpecifications" rows="4" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none font-mono text-sm"></textarea></div>
-                        
-                        <!-- UPDATED REVIEW & RATING SECTION -->
-                        <div class="border-t pt-4 mt-4">
-                            <h3 class="font-bold text-gray-700 dark:text-gray-300 mb-3"><i class="fas fa-star text-yellow-500 mr-2"></i>Featured Review (Optional)</h3>
-                            
-                            <div class="mb-2">
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Reviewer Name</label>
-                                <input type="text" id="pReviewName" placeholder="e.g., Happy Customer" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
-                            </div>
+        <!-- MAIN TABS -->
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex gap-4 mb-6 border-b dark:border-gray-700">
+                <button onclick="switchMainTab('website')" id="tabBtnWebsite" class="main-tab active px-6 py-3 rounded-t-lg font-bold transition">Website Manager</button>
+                <button onclick="switchMainTab('inventory')" id="tabBtnInventory" class="main-tab px-6 py-3 rounded-t-lg font-bold transition bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Inventory Manager</button>
+            </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Type Exact Rating (e.g., 4.1)</label>
-                                    <input type="text" id="pReviewRating" placeholder="4.1" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Or Select from Dropdown (3.2 to 4.9)</label>
-                                    <select id="ratingDropdown" onchange="document.getElementById('pReviewRating').value = this.value" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none">
-                                        <option value="">-- Select Rating --</option>
-                                        <option value="3.2">3.2</option><option value="3.3">3.3</option><option value="3.4">3.4</option><option value="3.5">3.5</option>
-                                        <option value="3.6">3.6</option><option value="3.7">3.7</option><option value="3.8">3.8</option><option value="3.9">3.9</option>
-                                        <option value="4.0">4.0</option><option value="4.1">4.1</option><option value="4.2">4.2</option><option value="4.3">4.3</option>
-                                        <option value="4.4">4.4</option><option value="4.5">4.5</option><option value="4.6">4.6</option><option value="4.7">4.7</option>
-                                        <option value="4.8">4.8</option><option value="4.9">4.9</option>
+            <!-- WEBSITE MANAGER CONTENT -->
+            <div id="contentWebsite" class="block">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white" id="formTitle"><i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add/Edit Product</h2>
+                        <form id="productForm" class="space-y-4">
+                            <input type="hidden" id="productId">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="block text-xs font-medium text-gray-500 mb-1">Product ID</label><input type="number" id="pId" required class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded"></div>
+                                <div><label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+                                    <select id="pCategory" required class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded">
+                                        <option value="">Select</option><option value="Arduino">Arduino</option><option value="ESP32">ESP32</option><option value="Sensors">Sensors</option>
+                                        <option value="Modules">Modules</option><option value="Raspberry Pi">Raspberry Pi</option><option value="Project Kit">Project Kit</option><option value="Projects">Projects</option>
                                     </select>
                                 </div>
                             </div>
-
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Review Comment</label>
-                                <textarea id="pReviewComment" placeholder="Write review here..." rows="2" class="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg outline-none"></textarea>
+                            <div><label class="block text-xs font-medium text-gray-500 mb-1">Product Name</label><input type="text" id="pName" required class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded"></div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div><label class="block text-xs font-medium text-gray-500 mb-1">Selling Price (₹)</label><input type="number" id="pPrice" required class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded"></div>
+                                <div><label class="block text-xs font-medium text-gray-500 mb-1">Original Price</label><input type="number" id="pOriginalPrice" class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded"></div>
+                                <div><label class="block text-xs font-medium text-green-600 mb-1">Stock Qty (Optional)</label><input type="number" id="pQty" placeholder="e.g. 10" class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded"></div>
                             </div>
-                        </div>
-
-                        <div class="flex gap-3 pt-4">
-                            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"><i class="fas fa-save mr-2"></i>Save</button>
-                            <button type="button" onclick="resetForm()" class="px-6 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white py-3 rounded-lg font-bold"><i class="fas fa-undo"></i></button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white"><i class="fas fa-list text-blue-600 mr-2"></i>Products</h2>
-                    <div id="productsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2"></div>
+                            <div><label class="block text-xs font-medium text-red-500 mb-1">Real Cost (₹) - Hidden from User</label><input type="number" id="pCost" placeholder="Buying price" class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded"></div>
+                            <div><label class="block text-xs font-medium text-gray-500 mb-1">Image URLs (Comma separated)</label><textarea id="pImages" required rows="2" class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded font-mono text-sm"></textarea></div>
+                            <div><label class="block text-xs font-medium text-gray-500 mb-1">Description</label><textarea id="pDescription" required rows="2" class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded"></textarea></div>
+                            <div><label class="block text-xs font-medium text-gray-500 mb-1">Specifications</label><textarea id="pSpecifications" rows="3" class="w-full px-3 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded font-mono text-sm"></textarea></div>
+                            
+                            <div class="flex gap-3 pt-4">
+                                <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700"><i class="fas fa-save mr-2"></i>Save</button>
+                                <button type="button" onclick="resetForm()" class="px-6 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white py-2 rounded font-bold"><i class="fas fa-undo"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Products List</h2>
+                        <div id="productsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2"></div>
+                    </div>
                 </div>
             </div>
 
+            <!-- INVENTORY MANAGER CONTENT -->
+            <div id="contentInventory" class="hidden">
+                <!-- Sub Tabs -->
+                <div class="flex gap-6 mb-6 border-b dark:border-gray-700 overflow-x-auto">
+                    <button onclick="switchSubTab('add')" class="sub-tab active px-4 py-2 whitespace-nowrap">Add Item</button>
+                    <button onclick="switchSubTab('update')" class="sub-tab px-4 py-2 whitespace-nowrap text-gray-500">Update Stock</button>
+                    <button onclick="switchSubTab('sales')" class="sub-tab px-4 py-2 whitespace-nowrap text-gray-500">Sales & Orders</button>
+                    <button onclick="switchSubTab('view')" class="sub-tab px-4 py-2 whitespace-nowrap text-gray-500">View Stock</button>
+                    <button onclick="switchSubTab('analytics')" class="sub-tab px-4 py-2 whitespace-nowrap text-gray-500">Analytics</button>
+                </div>
+
+                <!-- Sub Tab: Add Item -->
+                <div id="subContentAdd" class="block max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                    <h3 class="text-xl font-bold mb-4">Add New Inventory Item</h3>
+                    <form id="inventoryForm" class="space-y-4">
+                        <input type="text" id="invName" placeholder="Item Name (e.g., Arduino Uno)" required class="w-full px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded">
+                        <div class="grid grid-cols-3 gap-4">
+                            <input type="number" id="invQty" placeholder="Initial Qty" required class="px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded">
+                            <input type="number" id="invCost" placeholder="Real Cost (₹)" required class="px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded">
+                            <input type="number" id="invPrice" placeholder="Selling Price (₹)" required class="px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded">
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700">Add to Inventory</button>
+                    </form>
+                </div>
+
+                <!-- Sub Tab: Update Stock -->
+                <div id="subContentUpdate" class="hidden max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                    <h3 class="text-xl font-bold mb-4">Update Stock</h3>
+                    <input type="text" id="updateSearch" placeholder="Search item..." class="w-full px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded mb-4" oninput="renderUpdateList()">
+                    <div id="updateList" class="space-y-4"></div>
+                </div>
+
+                <!-- Sub Tab: Sales -->
+                <div id="subContentSales" class="hidden grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                        <h3 class="text-xl font-bold mb-4">Option A: WhatsApp Order</h3>
+                        <textarea id="waText" rows="6" placeholder="Paste WhatsApp order here..." class="w-full px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded mb-4"></textarea>
+                        <button onclick="processWhatsAppOrder()" class="w-full bg-blue-600 text-white py-2 rounded font-bold">Process & Deduct</button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                        <h3 class="text-xl font-bold mb-4">Option B: Manual Cart</h3>
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="cartSearch" placeholder="Search item..." class="flex-1 px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded">
+                            <input type="number" id="cartQty" placeholder="Qty" value="1" class="w-20 px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded">
+                            <button onclick="addToCart()" class="bg-green-600 text-white px-4 rounded"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="cartList" class="space-y-2 mb-4 max-h-60 overflow-y-auto"></div>
+                        <div class="border-t pt-4 flex justify-between font-bold text-lg">
+                            <span>Total:</span>
+                            <span id="cartTotal">₹0</span>
+                        </div>
+                        <button onclick="checkoutCart()" class="w-full mt-4 bg-orange-500 text-white py-2 rounded font-bold">Generate Receipt & Deduct</button>
+                    </div>
+                </div>
+
+                <!-- Sub Tab: View Stock -->
+                <div id="subContentView" class="hidden bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                    <input type="text" id="viewSearch" placeholder="Search stock..." class="w-full px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded mb-4" oninput="renderViewList()">
+                    <div id="viewList" class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-100 dark:bg-gray-700"><tr><th class="p-3">Name</th><th class="p-3">Qty</th><th class="p-3">Cost</th><th class="p-3">Price</th><th class="p-3">Value</th></tr></thead>
+                            <tbody id="viewTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sub Tab: Analytics -->
+                <div id="subContentAnalytics" class="hidden space-y-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-xl"><p class="text-sm text-blue-800 dark:text-blue-200">Total Potential Profit</p><p class="text-2xl font-bold text-blue-900 dark:text-white" id="anaPotential">₹0</p></div>
+                        <div class="bg-green-100 dark:bg-green-900 p-4 rounded-xl"><p class="text-sm text-green-800 dark:text-green-200">Total Profit Earned</p><p class="text-2xl font-bold text-green-900 dark:text-white" id="anaEarned">₹0</p></div>
+                        <div class="bg-purple-100 dark:bg-purple-900 p-4 rounded-xl"><p class="text-sm text-purple-800 dark:text-purple-200">Business Value</p><p class="text-2xl font-bold text-purple-900 dark:text-white" id="anaValue">₹0</p></div>
+                        <div class="bg-orange-100 dark:bg-orange-900 p-4 rounded-xl"><p class="text-sm text-orange-800 dark:text-orange-200">Items Sold</p><p class="text-2xl font-bold text-orange-900 dark:text-white" id="anaSold">0</p></div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow overflow-x-auto">
+                        <input type="text" id="anaSearch" placeholder="Filter products..." class="w-full px-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded mb-4" oninput="renderAnalytics()">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-100 dark:bg-gray-700"><tr><th class="p-3">Product</th><th class="p-3">Sold</th><th class="p-3">Profit/Piece</th><th class="p-3">Total Earned</th><th class="p-3">Stock</th><th class="p-3">Potential</th></tr></thead>
+                            <tbody id="anaTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GENERATE CODE SECTION -->
             <div class="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-xl p-6">
-                <h3 class="text-xl font-bold text-yellow-800 dark:text-yellow-400 mb-4"><i class="fas fa-info-circle mr-2"></i>Update Website</h3>
-                <button onclick="generateCode()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 text-lg"><i class="fas fa-code mr-2"></i>Generate Code & Copy</button>
+                <h3 class="text-xl font-bold text-yellow-800 dark:text-yellow-400 mb-4"><i class="fas fa-code mr-2"></i>Sync Data to Website</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Click below to generate the updated code. Copy it and paste it into your GitHub <code>products.js</code> file.</p>
+                <button onclick="generateCode()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 text-lg">Generate Code & Copy</button>
                 <textarea id="generatedCode" readonly class="mt-4 w-full h-40 p-4 bg-gray-800 text-green-400 font-mono text-xs rounded-lg hidden"></textarea>
             </div>
         </div>
     </div>
 
     <script>
-        let adminProducts = JSON.parse(localStorage.getItem('jugadteck_admin_products')) || [];
         let adminPassword = 'singh@12345678';
+        let products = JSON.parse(localStorage.getItem('jugadteck_products')) || [];
+        let inventory = JSON.parse(localStorage.getItem('jugadteck_inventory')) || [];
+        let cart = [];
 
-        function login() { if (document.getElementById('adminPassword').value === adminPassword) { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('adminDashboard').classList.remove('hidden'); renderProductsList(); } else alert('Wrong password!'); }
+        function login() { if (document.getElementById('adminPassword').value === adminPassword) { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('adminDashboard').classList.remove('hidden'); renderAll(); } else alert('Wrong password!'); }
         function logout() { location.reload(); }
 
+        function switchMainTab(tab) {
+            document.getElementById('contentWebsite').classList.toggle('hidden', tab !== 'website');
+            document.getElementById('contentInventory').classList.toggle('hidden', tab !== 'inventory');
+            document.getElementById('tabBtnWebsite').classList.toggle('active', tab === 'website');
+            document.getElementById('tabBtnInventory').classList.toggle('active', tab === 'inventory');
+            if(tab === 'website') document.getElementById('tabBtnWebsite').className = "main-tab active px-6 py-3 rounded-t-lg font-bold transition";
+            else document.getElementById('tabBtnWebsite').className = "main-tab px-6 py-3 rounded-t-lg font-bold transition bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300";
+            if(tab === 'inventory') document.getElementById('tabBtnInventory').className = "main-tab active px-6 py-3 rounded-t-lg font-bold transition";
+            else document.getElementById('tabBtnInventory').className = "main-tab px-6 py-3 rounded-t-lg font-bold transition bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300";
+            renderAll();
+        }
+
+        function switchSubTab(tab) {
+            ['add', 'update', 'sales', 'view', 'analytics'].forEach(t => {
+                document.getElementById(`subContent${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.add('hidden');
+                document.querySelector(`button[onclick="switchSubTab('${t}')"]`).classList.remove('active', 'text-blue-600', 'font-bold');
+                document.querySelector(`button[onclick="switchSubTab('${t}')"]`).classList.add('text-gray-500');
+            });
+            document.getElementById(`subContent${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+            document.querySelector(`button[onclick="switchSubTab('${tab}')"]`).classList.add('active', 'text-blue-600', 'font-bold');
+            document.querySelector(`button[onclick="switchSubTab('${tab}')"]`).classList.remove('text-gray-500');
+            renderAll();
+        }
+
+        function renderAll() {
+            renderProductsList();
+            renderUpdateList();
+            renderViewList();
+            renderAnalytics();
+            renderCart();
+        }
+
+        // --- WEBSITE MANAGER LOGIC ---
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = parseInt(document.getElementById('pId').value);
-            const idx = adminProducts.findIndex(p => p.id === id);
-            
-            const reviewName = document.getElementById('pReviewName').value;
-            const reviewComment = document.getElementById('pReviewComment').value;
-            const reviewRating = document.getElementById('pReviewRating').value; // Now takes text input
-
+            const idx = products.findIndex(p => p.id === id);
             const product = {
                 id, name: document.getElementById('pName').value, category: document.getElementById('pCategory').value,
                 price: parseFloat(document.getElementById('pPrice').value), originalPrice: parseFloat(document.getElementById('pOriginalPrice').value) || null,
                 discount: document.getElementById('pOriginalPrice').value ? true : false,
                 images: document.getElementById('pImages').value.split(',').map(u => u.trim()).filter(u => u),
-                description: document.getElementById('pDescription').value, specifications: document.getElementById('pSpecifications').value
+                description: document.getElementById('pDescription').value, specifications: document.getElementById('pSpecifications').value,
+                quantity: parseInt(document.getElementById('pQty').value) || null, costPrice: parseFloat(document.getElementById('pCost').value) || null
             };
-
-            if (reviewName || reviewComment || reviewRating) {
-                product.featuredReview = { 
-                    name: reviewName || 'Customer', 
-                    comment: reviewComment || '', 
-                    rating: reviewRating || '5.0' 
-                };
-            }
-
-            if (idx !== -1) adminProducts[idx] = product; else adminProducts.push(product);
-            localStorage.setItem('jugadteck_admin_products', JSON.stringify(adminProducts));
-            resetForm(); renderProductsList(); alert('Product Saved!');
-        });
-
-        document.getElementById('pImages').addEventListener('input', function() {
-            document.getElementById('imagePreviewContainer').innerHTML = this.value.split(',').map(u => u.trim()).filter(u => u).map(url => `<img src="${url}" class="h-16 w-16 object-cover rounded border dark:border-gray-600">`).join('');
+            if (idx !== -1) products[idx] = product; else products.push(product);
+            localStorage.setItem('jugadteck_products', JSON.stringify(products));
+            resetForm(); renderProductsList(); alert('Saved!');
         });
 
         function renderProductsList() {
-            document.getElementById('productsList').innerHTML = adminProducts.map(p => `
-                <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border dark:border-gray-600">
-                    <img src="${p.images ? p.images[0] : ''}" class="w-16 h-16 object-cover rounded border dark:border-gray-600">
-                    <div class="flex-1 min-w-0"><h4 class="font-bold text-gray-800 dark:text-white truncate">${p.name}</h4><p class="text-sm text-gray-500 dark:text-gray-400">${p.category} - ₹${p.price}</p></div>
-                    <div class="flex gap-2"><button onclick="editProduct(${p.id})" class="bg-blue-500 text-white w-8 h-8 rounded flex items-center justify-center"><i class="fas fa-edit text-xs"></i></button><button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white w-8 h-8 rounded flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button></div>
+            document.getElementById('productsList').innerHTML = products.map(p => `
+                <div class="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded border dark:border-gray-600">
+                    <div class="flex-1"><h4 class="font-bold truncate">${p.name}</h4><p class="text-xs text-gray-500">Qty: ${p.quantity || 'N/A'} | Cost: ₹${p.costPrice || 'N/A'}</p></div>
+                    <button onclick="editProduct(${p.id})" class="bg-blue-500 text-white w-8 h-8 rounded"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white w-8 h-8 rounded"><i class="fas fa-trash"></i></button>
                 </div>`).join('');
         }
 
         function editProduct(id) {
-            const p = adminProducts.find(x => x.id === id);
+            const p = products.find(x => x.id === id);
             document.getElementById('pId').value = p.id; document.getElementById('pName').value = p.name; document.getElementById('pCategory').value = p.category;
             document.getElementById('pPrice').value = p.price; document.getElementById('pOriginalPrice').value = p.originalPrice || '';
+            document.getElementById('pQty').value = p.quantity || ''; document.getElementById('pCost').value = p.costPrice || '';
             document.getElementById('pImages').value = p.images ? p.images.join(', ') : ''; document.getElementById('pDescription').value = p.description; document.getElementById('pSpecifications').value = p.specifications || '';
-            
-            if (p.featuredReview) {
-                document.getElementById('pReviewName').value = p.featuredReview.name || '';
-                document.getElementById('pReviewComment').value = p.featuredReview.comment || '';
-                document.getElementById('pReviewRating').value = p.featuredReview.rating || '';
-                document.getElementById('ratingDropdown').value = p.featuredReview.rating || '';
-            } else {
-                document.getElementById('pReviewName').value = '';
-                document.getElementById('pReviewComment').value = '';
-                document.getElementById('pReviewRating').value = '';
-                document.getElementById('ratingDropdown').value = '';
-            }
-
-            document.getElementById('pImages').dispatchEvent(new Event('input'));
-            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit text-blue-600 mr-2"></i>Edit Product';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        function deleteProduct(id) { if(confirm('Delete?')) { products = products.filter(p => p.id !== id); localStorage.setItem('jugadteck_products', JSON.stringify(products)); renderProductsList(); } }
+        function resetForm() { document.getElementById('productForm').reset(); }
 
-        function deleteProduct(id) { if(confirm('Delete?')) { adminProducts = adminProducts.filter(p => p.id !== id); localStorage.setItem('jugadteck_admin_products', JSON.stringify(adminProducts)); renderProductsList(); } }
-        function resetForm() { 
-            document.getElementById('productForm').reset(); document.getElementById('productId').value = ''; 
-            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle text-blue-600 mr-2"></i>Add New Product'; 
-            document.getElementById('imagePreviewContainer').innerHTML = ''; 
-            document.getElementById('pReviewName').value = '';
-            document.getElementById('pReviewComment').value = '';
-            document.getElementById('pReviewRating').value = '';
-            document.getElementById('ratingDropdown').value = '';
+        // --- INVENTORY LOGIC ---
+        document.getElementById('inventoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('invName').value.trim();
+            if (inventory.some(i => i.name.toLowerCase() === name.toLowerCase())) return alert('Item already exists!');
+            inventory.push({
+                name, quantity: parseInt(document.getElementById('invQty').value),
+                costPrice: parseFloat(document.getElementById('invCost').value), sellingPrice: parseFloat(document.getElementById('invPrice').value),
+                sold: 0
+            });
+            localStorage.setItem('jugadteck_inventory', JSON.stringify(inventory));
+            this.reset(); renderAll(); alert('Added!');
+        });
+
+        function renderUpdateList() {
+            const search = document.getElementById('updateSearch').value.toLowerCase();
+            const list = inventory.filter(i => i.name.toLowerCase().includes(search));
+            document.getElementById('updateList').innerHTML = list.map((i, idx) => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                    <div><h4 class="font-bold">${i.name}</h4><p class="text-sm text-gray-500">Current: ${i.quantity}</p></div>
+                    <div class="flex gap-2">
+                        <button onclick="updateStock('${i.name}', 1)" class="bg-green-500 text-white px-3 py-1 rounded">+ Add</button>
+                        <button onclick="updateStock('${i.name}', -1)" class="bg-yellow-500 text-white px-3 py-1 rounded">- Remove</button>
+                        <button onclick="setExactStock('${i.name}')" class="bg-blue-500 text-white px-3 py-1 rounded">= Set</button>
+                        <button onclick="deleteInventory('${i.name}')" class="bg-red-500 text-white px-3 py-1 rounded"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`).join('');
         }
-        
+
+        function updateStock(name, change) {
+            const item = inventory.find(i => i.name === name);
+            if (item) { item.quantity += change; if(item.quantity < 0) item.quantity = 0; localStorage.setItem('jugadteck_inventory', JSON.stringify(inventory)); renderAll(); }
+        }
+        function setExactStock(name) {
+            const val = prompt("Enter exact quantity:");
+            if (val !== null) { const item = inventory.find(i => i.name === name); if(item) { item.quantity = parseInt(val); localStorage.setItem('jugadteck_inventory', JSON.stringify(inventory)); renderAll(); } }
+        }
+        function deleteInventory(name) { if(confirm(`Delete ${name}?`)) { inventory = inventory.filter(i => i.name !== name); localStorage.setItem('jugadteck_inventory', JSON.stringify(inventory)); renderAll(); } }
+
+        function renderViewList() {
+            const search = document.getElementById('viewSearch').value.toLowerCase();
+            const list = inventory.filter(i => i.name.toLowerCase().includes(search));
+            document.getElementById('viewTableBody').innerHTML = list.map(i => `
+                <tr class="border-b dark:border-gray-700"><td class="p-3">${i.name}</td><td class="p-3">${i.quantity}</td><td class="p-3">₹${i.costPrice}</td><td class="p-3">₹${i.sellingPrice}</td><td class="p-3">₹${i.quantity * i.sellingPrice}</td></tr>
+            `).join('');
+        }
+
+        function renderAnalytics() {
+            const search = document.getElementById('anaSearch').value.toLowerCase();
+            const list = inventory.filter(i => i.name.toLowerCase().includes(search));
+            let totalPotential = 0, totalEarned = 0, totalValue = 0, totalSold = 0;
+            
+            document.getElementById('anaTableBody').innerHTML = list.map(i => {
+                const profitPerPiece = i.sellingPrice - i.costPrice;
+                const earned = profitPerPiece * i.sold;
+                const potential = profitPerPiece * i.quantity;
+                totalPotential += potential; totalEarned += earned; totalValue += (i.quantity * i.sellingPrice); totalSold += i.sold;
+                return `<tr class="border-b dark:border-gray-700"><td class="p-3">${i.name}</td><td class="p-3">${i.sold}</td><td class="p-3 text-green-600">₹${profitPerPiece}</td><td class="p-3 font-bold">₹${earned}</td><td class="p-3">${i.quantity}</td><td class="p-3 text-blue-600">₹${potential}</td></tr>`;
+            }).join('');
+
+            document.getElementById('anaPotential').textContent = `₹${totalPotential.toLocaleString('en-IN')}`;
+            document.getElementById('anaEarned').textContent = `₹${totalEarned.toLocaleString('en-IN')}`;
+            document.getElementById('anaValue').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
+            document.getElementById('anaSold').textContent = totalSold;
+        }
+
+        // --- SALES LOGIC ---
+        function processWhatsAppOrder() {
+            const text = document.getElementById('waText').value;
+            // Simple regex to find "Qty x ItemName" or "Qty*ItemName"
+            const regex = /(\d+)\s*[xX*]\s*([a-zA-Z0-9\s]+)/g;
+            let match;
+            let receipt = "*JugadTeck Order Receipt*\n\n";
+            let total = 0;
+            let errors = [];
+
+            while ((match = regex.exec(text)) !== null) {
+                const qty = parseInt(match[1]);
+                const itemName = match[2].trim();
+                const item = inventory.find(i => i.name.toLowerCase() === itemName.toLowerCase());
+                
+                if (item) {
+                    if (item.quantity >= qty) {
+                        item.quantity -= qty;
+                        item.sold += qty;
+                        const subtotal = qty * item.sellingPrice;
+                        total += subtotal;
+                        receipt += `${qty}x ${item.name} - ₹${subtotal}\n`;
+                    } else { errors.push(`${item.name} (Only ${item.quantity} left)`); }
+                } else { errors.push(`${itemName} (Not found)`); }
+            }
+
+            if (errors.length > 0) alert("Errors:\n" + errors.join("\n"));
+            receipt += `\n*Total: ₹${total}*`;
+            localStorage.setItem('jugadteck_inventory', JSON.stringify(inventory));
+            downloadReceipt(receipt);
+            renderAll();
+            document.getElementById('waText').value = '';
+        }
+
+        function addToCart() {
+            const name = document.getElementById('cartSearch').value.trim();
+            const qty = parseInt(document.getElementById('cartQty').value);
+            const item = inventory.find(i => i.name.toLowerCase() === name.toLowerCase());
+            if (item && item.quantity >= qty) {
+                cart.push({ ...item, cartQty: qty });
+                document.getElementById('cartSearch').value = '';
+                renderCart();
+            } else alert("Item not found or low stock!");
+        }
+
+        function renderCart() {
+            document.getElementById('cartList').innerHTML = cart.map((c, i) => `
+                <div class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                    <span>${c.cartQty}x ${c.name}</span>
+                    <button onclick="cart.splice(${i},1); renderCart()" class="text-red-500"><i class="fas fa-times"></i></button>
+                </div>`).join('');
+            const total = cart.reduce((sum, c) => sum + (c.cartQty * c.sellingPrice), 0);
+            document.getElementById('cartTotal').textContent = `₹${total}`;
+        }
+
+        function checkoutCart() {
+            if (cart.length === 0) return alert("Cart empty!");
+            let receipt = "*JugadTeck Order Receipt*\n\n";
+            let total = 0;
+            cart.forEach(c => {
+                const item = inventory.find(i => i.name === c.name);
+                item.quantity -= c.cartQty;
+                item.sold += c.cartQty;
+                const sub = c.cartQty * c.sellingPrice;
+                total += sub;
+                receipt += `${c.cartQty}x ${c.name} - ₹${sub}\n`;
+            });
+            receipt += `\n*Total: ₹${total}*`;
+            localStorage.setItem('jugadteck_inventory', JSON.stringify(inventory));
+            downloadReceipt(receipt);
+            cart = []; renderAll();
+        }
+
+        function downloadReceipt(text) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `JugadTeck_Receipt_${Date.now()}.txt`;
+            a.click();
+        }
+
+        // --- SYNC CODE GENERATOR ---
         function generateCode() {
-            const code = `const PRODUCTS = ${JSON.stringify(adminProducts, null, 4)};`;
+            // Merge inventory data into products for the website
+            const mergedProducts = products.map(p => {
+                const invItem = inventory.find(i => i.name.toLowerCase() === p.name.toLowerCase());
+                return { ...p, quantity: invItem ? invItem.quantity : p.quantity };
+            });
+            
+            const code = `const PRODUCTS = ${JSON.stringify(mergedProducts, null, 4)};`;
             const ta = document.getElementById('generatedCode'); ta.value = code; ta.classList.remove('hidden'); ta.select(); document.execCommand('copy');
-            alert('Code copied! Go to GitHub -> products.js -> Edit -> Paste -> Commit changes.');
+            alert('Code copied! Paste into products.js on GitHub.');
         }
+
         document.getElementById('adminPassword').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
     </script>
 </body>
