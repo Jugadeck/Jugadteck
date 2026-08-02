@@ -3,184 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JugadTeck - 3D Electronics Store</title>
+    <title>JugadTeck - From Concept to Circuit</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { neon: '#00f3ff', neonPink: '#ff00ff' } } } }</script>
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#1e40af' } } } }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- 3D Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
-        
-        body { font-family: 'Rajdhani', sans-serif; overflow-x: hidden; background: #02020a; color: white; }
-        h1, h2, h3, .brand-font { font-family: 'Orbitron', sans-serif; }
-        
-        /* 3D Background */
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        
-        /* Glassmorphism */
-        .glass { background: rgba(10, 10, 30, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(0, 243, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
-        .glass-modal { background: rgba(5, 5, 15, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0, 243, 255, 0.3); }
-        
-        /* 3D Card Styles */
-        .product-card-3d { transform-style: preserve-3d; transform: perspective(1000px); }
-        .product-card-3d .card-content { transform: translateZ(30px); }
-        .product-card-3d .card-img-container { transform: translateZ(50px); }
-        
-        /* Neon Effects */
-        .neon-text { text-shadow: 0 0 5px #00f3ff, 0 0 10px #00f3ff; }
-        .neon-border { box-shadow: 0 0 10px #00f3ff, inset 0 0 5px #00f3ff; }
-        .btn-neon { background: linear-gradient(45deg, #00f3ff, #0066ff); box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); transition: all 0.3s; }
-        .btn-neon:hover { box-shadow: 0 0 25px rgba(0, 243, 255, 0.8); transform: translateY(-2px); }
-        
-        /* Cart & Modal */
-        .cart-sidebar { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        * { box-sizing: border-box; }
+        .cart-sidebar { transform: translateX(100%); transition: transform 0.3s ease-in-out; }
         .cart-sidebar.open { transform: translateX(0); }
-        #productDetailsModal { display: none; opacity: 0; transition: opacity 0.3s; }
-        #productDetailsModal.active { display: flex; opacity: 1; }
+        .product-card { transition: transform 0.3s, box-shadow 0.3s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        .logo-container { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: white; border: 2px solid #1e40af; cursor: pointer; }
+        .logo-container img { width: 100%; height: 100%; object-fit: cover; }
+        #productDetailsModal { display: none; }
+        #productDetailsModal.active { display: block; }
+        .main-image-container { position: relative; overflow: hidden; cursor: grab; background: #f8f9fa; touch-action: pan-y; }
+        .main-image-container:active { cursor: grabbing; }
+        .main-image-container img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; user-select: none; -webkit-user-drag: none; }
+        .thumbnail { width: 60px; height: 60px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; overflow: hidden; transition: all 0.2s; flex-shrink: 0; }
+        .thumbnail:hover, .thumbnail.active { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
+        .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+        .tab-btn { padding: 12px 24px; font-weight: 600; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #050510; }
-        ::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 4px; }
+        /* Scrollable Content */
+        .scrollable-content { max-height: 220px; overflow-y: auto; padding-right: 10px; }
+        /* FIX: Specifications ke liye 12 lines (approx 300px) */
+        #tab-specifications .scrollable-content { max-height: 300px; }
         
-        .tab-btn.active { color: #00f3ff; border-bottom: 2px solid #00f3ff; text-shadow: 0 0 8px #00f3ff; }
-        
-        /* Specs Table Neon */
-        .specs-table td { border-bottom: 1px solid rgba(0, 243, 255, 0.1); padding: 8px; }
-        .specs-table tr:last-child td { border-bottom: none; }
-        .specs-table td:first-child { color: #00f3ff; font-weight: bold; width: 40%; }
+        .scrollable-content::-webkit-scrollbar { width: 6px; }
+        .scrollable-content::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        .floating-whatsapp { position: fixed; bottom: 100px; right: 20px; z-index: 40; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
+        .img-action-btn { position: absolute; top: 10px; z-index: 20; background: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.2s; }
+        .img-action-btn:hover { transform: scale(1.1); }
+        .img-action-btn.wishlist { right: 10px; color: #6b7280; }
+        .img-action-btn.wishlist.active { color: #ef4444; }
+        .img-action-btn.share { right: 56px; color: #6b7280; }
+        .specs-table { width: 100%; }
+        .specs-table tr { border-bottom: 1px solid #e5e7eb; }
+        .dark .specs-table tr { border-bottom-color: #374151; }
+        .specs-table td { padding: 10px 12px; vertical-align: top; font-size: 0.9rem; }
+        .specs-table td:first-child { font-weight: 600; color: #374151; width: 40%; background: #f9fafb; }
+        .dark .specs-table td:first-child { background: #1f2937; color: #e5e7eb; }
+        .dark .specs-table td:last-child { color: #d1d5db; }
     </style>
 </head>
-<body class="min-h-screen">
-
-    <!-- 3D Background -->
-    <canvas id="bg-canvas"></canvas>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 
     <!-- Header -->
-    <header class="glass sticky top-0 z-40 border-b border-cyan-500/30">
+    <header class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-40">
         <div class="container mx-auto px-4 py-3">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_#00f3ff]">
-                        <img src="logo.png" class="w-10 h-10 rounded-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xl font-bold text-white brand-font\'>JT</span>'">
-                    </div>
-                    <div class="hidden md:block">
-                        <h1 class="text-2xl font-bold text-white neon-text brand-font">JUGADTECK</h1>
-                        <p class="text-xs text-cyan-300">From Concept to Circuit</p>
-                    </div>
+                <div class="flex items-center gap-3" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
+                    <div class="logo-container"><img src="logo.png" alt="JugadTeck"></div>
+                    <div class="hidden md:block"><h1 class="text-2xl font-bold text-blue-900 dark:text-blue-400">JUGADTECK</h1><p class="text-xs text-gray-600 dark:text-gray-400">From Concept to Circuit</p></div>
                 </div>
                 <div class="flex-1 max-w-xl mx-8 hidden md:block">
-                    <div class="relative">
-                        <input type="text" id="searchInput" placeholder="Search components..." class="w-full pl-12 pr-4 py-2 rounded-full bg-black/50 border border-cyan-500/30 text-white focus:border-cyan-400 focus:shadow-[0_0_15px_#00f3ff] outline-none transition">
-                        <i class="fas fa-search absolute left-4 top-3 text-cyan-400"></i>
-                    </div>
+                    <div class="relative"><input type="text" id="searchInput" placeholder="Search products..." class="w-full pl-12 pr-4 py-2 rounded-full border-2 border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-600 outline-none"><i class="fas fa-search absolute left-4 top-3 text-gray-400"></i></div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <a href="admin.html" class="text-cyan-400 hover:text-white transition text-xl"><i class="fas fa-user-shield"></i></a>
-                    <button onclick="toggleCart()" class="relative btn-neon text-white px-5 py-2 rounded-full font-bold">
-                        <i class="fas fa-shopping-cart mr-2"></i><span class="hidden md:inline">Cart</span>
-                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold border-2 border-gray-900">0</span>
-                    </button>
+                    <button onclick="toggleDarkMode()" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition"><i class="fas fa-moon dark:hidden text-xl"></i><i class="fas fa-sun hidden dark:inline text-xl"></i></button>
+                    <a href="admin.html" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition" title="Admin Login"><i class="fas fa-user-shield text-xl"></i></a>
+                    <button onclick="toggleCart()" class="relative bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition"><i class="fas fa-shopping-cart mr-2"></i><span class="hidden md:inline">Cart</span><span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">0</span></button>
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Hero -->
-    <section class="relative py-20 md:py-32 overflow-hidden">
-        <div class="container mx-auto px-4 text-center relative z-10">
-            <h2 class="text-5xl md:text-7xl font-bold mb-6 text-white neon-text brand-font">NEXT-GEN ELECTRONICS</h2>
-            <p class="text-xl md:text-2xl mb-10 text-cyan-200 max-w-3xl mx-auto">Explore Arduino, ESP32, Raspberry Pi & IoT in an immersive 3D experience.</p>
-            <button onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})" class="btn-neon text-white px-10 py-4 rounded-full font-bold text-lg brand-font">
-                ENTER STORE <i class="fas fa-rocket ml-2"></i>
-            </button>
+    <section class="bg-gradient-to-r from-blue-900 via-blue-700 to-teal-600 text-white py-12 md:py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4">Electronics Components & Modules</h2>
+            <p class="text-lg md:text-xl mb-8 opacity-90">Arduino • ESP32 • Raspberry Pi • Sensors • IoT • Projects</p>
+            <button onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})" class="bg-white text-blue-900 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition">Shop Now <i class="fas fa-arrow-down ml-2"></i></button>
         </div>
     </section>
 
     <!-- Products -->
-    <section id="products" class="container mx-auto px-4 py-12 relative z-10">
-        <h2 class="text-4xl font-bold text-center mb-10 text-white neon-text brand-font">HOLOGRAPHIC INVENTORY</h2>
-        <div class="flex flex-wrap justify-center gap-3 mb-10" id="categoryFilters">
-            <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2 rounded-full glass text-cyan-300 hover:text-white hover:bg-cyan-500/20 transition font-bold border border-cyan-500/30">All</button>
-            <button onclick="filterProducts('Arduino')" class="filter-btn px-6 py-2 rounded-full glass text-cyan-300 hover:text-white hover:bg-cyan-500/20 transition font-bold border border-cyan-500/30">Arduino</button>
-            <button onclick="filterProducts('ESP32')" class="filter-btn px-6 py-2 rounded-full glass text-cyan-300 hover:text-white hover:bg-cyan-500/20 transition font-bold border border-cyan-500/30">ESP32</button>
-            <button onclick="filterProducts('Sensors')" class="filter-btn px-6 py-2 rounded-full glass text-cyan-300 hover:text-white hover:bg-cyan-500/20 transition font-bold border border-cyan-500/30">Sensors</button>
-            <button onclick="filterProducts('Modules')" class="filter-btn px-6 py-2 rounded-full glass text-cyan-300 hover:text-white hover:bg-cyan-500/20 transition font-bold border border-cyan-500/30">Modules</button>
-            <button onclick="filterProducts('Project Kit')" class="filter-btn px-6 py-2 rounded-full glass text-cyan-300 hover:text-white hover:bg-cyan-500/20 transition font-bold border border-cyan-500/30">Project Kit</button>
-            <button onclick="filterProducts('Projects')" class="filter-btn px-6 py-2 rounded-full glass text-cyan-300 hover:text-white hover:bg-cyan-500/20 transition font-bold border border-cyan-500/30">Projects</button>
+    <section id="products" class="container mx-auto px-4 py-12">
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Our Products</h2>
+        <div class="flex flex-wrap justify-center gap-3 mb-8" id="categoryFilters">
+            <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2 rounded-full bg-blue-600 text-white font-medium">All</button>
+            <button onclick="filterProducts('Arduino')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">Arduino</button>
+            <button onclick="filterProducts('ESP32')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">ESP32</button>
+            <button onclick="filterProducts('Sensors')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">Sensors</button>
+            <button onclick="filterProducts('Modules')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">Modules</button>
+            <button onclick="filterProducts('Project Kit')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">Project Kit</button>
+            <button onclick="filterProducts('Projects')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium">Projects</button>
         </div>
-        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
     </section>
 
-    <!-- PRODUCT DETAILS MODAL (3D) -->
-    <div id="productDetailsModal" class="fixed inset-0 z-50 overflow-y-auto items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-modal rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto relative border border-cyan-500/30 shadow-[0_0_50px_rgba(0,243,255,0.2)] my-auto">
-            <button onclick="closeProductDetails()" class="absolute top-4 right-4 text-white hover:text-cyan-400 text-2xl z-20 bg-black/50 rounded-full w-10 h-10 flex items-center justify-center border border-cyan-500/50"><i class="fas fa-times"></i></button>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-10">
-                <!-- Image Section -->
-                <div class="relative bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 flex flex-col items-center justify-center border border-cyan-500/20" id="tiltImageContainer">
-                    <div class="absolute top-4 right-4 flex gap-3 z-10">
-                        <button id="modalShareBtn" class="bg-black/50 text-white hover:text-cyan-400 w-10 h-10 rounded-full flex items-center justify-center border border-cyan-500/30"><i class="fas fa-share-alt"></i></button>
-                        <button id="modalWishlistBtn" class="bg-black/50 text-white hover:text-red-500 w-10 h-10 rounded-full flex items-center justify-center border border-cyan-500/30"><i class="far fa-heart"></i></button>
+    <!-- FAQ -->
+    <section class="bg-gray-100 dark:bg-gray-800 py-12">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-white dark:bg-gray-700 rounded-lg p-4"><h3 class="font-bold text-lg mb-2 text-gray-800 dark:text-white"><i class="fas fa-truck mr-2 text-blue-600"></i>Delivery Time?</h3><p class="text-gray-600 dark:text-gray-300">We deliver within 3-7 business days across India.</p></div>
+                <div class="bg-white dark:bg-gray-700 rounded-lg p-4"><h3 class="font-bold text-lg mb-2 text-gray-800 dark:text-white"><i class="fas fa-undo mr-2 text-blue-600"></i>Return Policy?</h3><p class="text-gray-600 dark:text-gray-300">7 days replacement guarantee. Product must be unused.</p></div>
+                <div class="bg-white dark:bg-gray-700 rounded-lg p-4"><h3 class="font-bold text-lg mb-2 text-gray-800 dark:text-white"><i class="fas fa-credit-card mr-2 text-blue-600"></i>Payment Methods?</h3><p class="text-gray-600 dark:text-gray-300">We accept UPI, Cards, Net Banking, and COD.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCT DETAILS MODAL -->
+    <div id="productDetailsModal" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-y-auto">
+        <div class="sticky top-0 bg-white dark:bg-gray-800 border-b shadow-sm z-10">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-7xl">
+                <button onclick="closeProductDetails()" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 flex items-center gap-2 font-medium"><i class="fas fa-arrow-left"></i> Back</button>
+                <button onclick="toggleCart()" class="relative bg-blue-600 text-white px-4 py-2 rounded-full"><i class="fas fa-shopping-cart mr-2"></i><span id="cartCountModal" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">0</span></button>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-4 py-6 md:py-10 max-w-7xl">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-5">
+                    <div class="sticky top-20">
+                        <div class="main-image-container bg-gray-50 dark:bg-gray-800 rounded-xl border aspect-square flex items-center justify-center mb-4" id="mainImageContainer">
+                            <img id="detailImage" src="" alt="Product" class="max-h-full max-w-full p-4">
+                            <button id="modalShareBtn" class="img-action-btn share"><i class="fas fa-share-alt"></i></button>
+                            <button id="modalWishlistBtn" class="img-action-btn wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                        <div class="flex gap-2 overflow-x-auto pb-2" id="thumbnailContainer"></div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 text-center mt-2"><i class="fas fa-hand-pointer mr-1"></i> Swipe or click to change image</p>
                     </div>
-                    <img id="detailImage" src="" alt="Product" class="max-h-[400px] w-auto object-contain drop-shadow-[0_0_20px_rgba(0,243,255,0.3)] mb-4">
-                    <div class="flex gap-2 overflow-x-auto w-full pb-2" id="thumbnailContainer"></div>
                 </div>
 
-                <!-- Info Section -->
-                <div class="space-y-6">
-                    <div>
-                        <span id="detailCategory" class="text-cyan-400 text-sm font-bold tracking-widest uppercase"></span>
-                        <h1 id="detailTitle" class="text-3xl md:text-4xl font-bold text-white mt-2 brand-font neon-text"></h1>
-                        <div class="flex items-center gap-3 mt-3">
-                            <span id="detailStockStatus" class="text-sm font-bold text-green-400"><i class="fas fa-check-circle mr-1"></i>In Stock</span>
-                        </div>
+                <div class="lg:col-span-7">
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                        <span class="hover:text-blue-600 cursor-pointer" onclick="closeProductDetails()">Home</span> <i class="fas fa-chevron-right text-xs mx-2"></i> <span id="detailCategory" class="text-blue-600 font-medium"></span>
+                    </div>
+                    <h1 id="detailTitle" class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white leading-tight mb-3"></h1>
+                    <div class="flex items-center gap-3 mb-4 flex-wrap">
+                        <span id="detailStockStatus" class="text-sm font-medium"><i class="fas fa-check-circle mr-1"></i>In Stock</span>
                     </div>
                     
-                    <div class="glass p-4 rounded-xl border border-cyan-500/20">
-                        <p class="text-xs text-gray-400 mb-1">CURRENT PRICE</p>
-                        <div class="flex items-baseline gap-3">
-                            <span class="text-4xl font-bold text-cyan-400 neon-text" id="detailPrice"></span>
+                    <div class="border-t border-b py-4 mb-4 dark:border-gray-700">
+                        <div class="flex items-baseline gap-2 mb-1"><span class="text-sm text-gray-500 dark:text-gray-400">Price:</span></div>
+                        <div class="flex items-baseline gap-3 flex-wrap">
+                            <span class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white" id="detailPrice"></span>
                             <span class="text-lg text-gray-500 line-through hidden" id="detailOriginalPrice"></span>
-                            <span class="text-sm text-green-400 font-bold hidden" id="detailDiscount"></span>
+                            <span class="text-lg text-green-600 font-bold hidden" id="detailDiscount"></span>
                         </div>
-                        <p class="text-[10px] text-gray-500 mt-2">Inclusive of all taxes • Free delivery available</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Inclusive of all taxes • Free delivery available</p>
                     </div>
 
-                    <!-- Delivery Progress (Restored) -->
-                    <div class="glass p-3 rounded-xl border border-cyan-500/20">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-cyan-300"><i class="fas fa-truck mr-2"></i>Free Delivery Progress</span>
-                            <span class="text-xs text-cyan-400" id="deliveryStatusText">Add items to unlock</span>
+                    <div id="deliveryProgressContainer" class="mb-6 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div class="flex justify-between items-center mb-2"><span class="text-sm font-bold text-blue-800 dark:text-blue-300"><i class="fas fa-truck mr-2"></i>Free Delivery Progress</span><span class="text-xs text-blue-600 dark:text-blue-400" id="deliveryStatusText">Add items to unlock</span></div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"><div id="deliveryProgressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <button id="btnBuyNow" onclick="buyNowWhatsApp()" class="flex-1 bg-yellow-500 text-gray-900 py-3 rounded-lg font-bold hover:bg-yellow-400 transition flex items-center justify-center gap-2 text-lg shadow-md"><i class="fab fa-whatsapp text-xl"></i> Buy Now</button>
+                        <button id="btnAddCart" onclick="addToCartFromDetails()" class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2 text-lg shadow-md"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                    </div>
+
+                    <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
+                        <div class="flex gap-2 overflow-x-auto">
+                            <button class="tab-btn active" onclick="switchTab('description', this)">Description</button>
+                            <button class="tab-btn" onclick="switchTab('specifications', this)">Specifications</button>
                         </div>
-                        <div class="w-full bg-gray-800 rounded-full h-2">
-                            <div id="deliveryProgressBar" class="bg-cyan-500 h-2 rounded-full transition-all duration-500 shadow-[0_0_10px_#00f3ff]" style="width: 0%"></div>
-                        </div>
                     </div>
 
-                    <div class="flex gap-4">
-                        <button id="btnBuyNow" onclick="buyNowWhatsApp()" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:shadow-[0_0_20px_#10b981] transition flex items-center justify-center gap-2 border border-green-400/30"><i class="fab fa-whatsapp text-xl"></i> BUY NOW</button>
-                        <button id="btnAddCart" onclick="addToCartFromDetails()" class="flex-1 btn-neon text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"><i class="fas fa-cart-plus"></i> ADD TO CART</button>
-                    </div>
+                    <div class="tab-content active" id="tab-description"><h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">About this item</h3><div class="scrollable-content text-gray-600 dark:text-gray-300 leading-relaxed" id="detailDescription"></div></div>
+                    <div class="tab-content" id="tab-specifications"><h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">Product Specifications</h3><div class="scrollable-content bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700" id="detailSpecifications"></div></div>
 
-                    <!-- Tabs -->
-                    <div class="border-b border-gray-700 flex gap-6">
-                        <button class="tab-btn active pb-2 font-bold" onclick="switchTab('description', this)">Description</button>
-                        <button class="tab-btn pb-2 text-gray-400 font-bold" onclick="switchTab('specifications', this)">Specs</button>
-                    </div>
-                    <div class="tab-content active max-h-48 overflow-y-auto pr-2 text-gray-300" id="tab-description"><p id="detailDescription"></p></div>
-                    <div class="tab-content hidden max-h-48 overflow-y-auto pr-2" id="tab-specifications">
-                        <table class="w-full specs-table text-sm" id="detailSpecifications"></table>
-                    </div>
-
-                    <!-- Related Products (Restored) -->
-                    <div class="mt-8 pt-6 border-t border-gray-700">
-                        <h3 class="text-xl font-bold mb-4 text-cyan-400 brand-font">Related Products</h3>
+                    <!-- RELATED PRODUCTS -->
+                    <div class="mt-12">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Related Products</h3>
                         <div id="relatedProductsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
                     </div>
                 </div>
@@ -189,91 +184,36 @@
     </div>
 
     <!-- Cart Sidebar -->
-    <div id="cartSidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full md:w-[450px] glass-modal shadow-2xl z-[60] flex flex-col border-l border-cyan-500/30">
-        <div class="p-5 border-b border-cyan-500/30 flex justify-between items-center bg-black/60">
-            <h3 class="text-xl font-bold text-cyan-400 brand-font"><i class="fas fa-shopping-cart mr-2"></i>HOLO-CART</h3>
-            <button onclick="toggleCart(false)" class="text-white hover:text-cyan-400 text-2xl"><i class="fas fa-times"></i></button>
+    <div id="cartSidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full md:w-[450px] bg-white dark:bg-gray-800 shadow-2xl z-[60] flex flex-col">
+        <div class="bg-blue-900 text-white p-4 flex justify-between items-center"><h3 class="text-xl font-bold"><i class="fas fa-shopping-cart mr-2"></i>Shopping Cart</h3><button onclick="toggleCart(false)" class="text-2xl"><i class="fas fa-times"></i></button></div>
+        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border-b dark:border-gray-700">
+            <div class="flex justify-between items-center mb-2"><span class="text-sm font-bold text-blue-800 dark:text-blue-300"><i class="fas fa-truck mr-2"></i>Free Delivery</span><span class="text-xs text-blue-600 dark:text-blue-400" id="cartDeliveryStatus">Add items</span></div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2"><div id="cartDeliveryBar" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div></div>
         </div>
-        
-        <!-- Cart Delivery Progress -->
-        <div class="p-4 border-b border-cyan-500/20 bg-black/40">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-bold text-cyan-300"><i class="fas fa-truck mr-2"></i>Free Delivery</span>
-                <span class="text-xs text-cyan-400" id="cartDeliveryStatus">Add items</span>
-            </div>
-            <div class="w-full bg-gray-800 rounded-full h-2">
-                <div id="cartDeliveryBar" class="bg-cyan-500 h-2 rounded-full transition-all duration-500 shadow-[0_0_10px_#00f3ff]" style="width: 0%"></div>
-            </div>
-        </div>
-
         <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
-        <div class="p-5 border-t border-cyan-500/30 bg-black/80">
-            <div class="flex justify-between mb-2 text-sm"><span class="text-gray-400">Subtotal:</span><span id="cartSubtotal" class="font-bold text-white">0</span></div>
-            <div class="flex justify-between mb-4 text-sm"><span class="text-gray-400">Delivery:</span><span id="cartDeliveryCharge" class="font-bold text-red-400">40</span></div>
-            <div class="flex justify-between mb-6 text-xl border-t border-gray-700 pt-3"><span class="font-bold text-white brand-font">TOTAL:</span><span id="cartTotal" class="font-bold text-cyan-400 neon-text">0</span></div>
-            <button onclick="checkoutWhatsApp()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:shadow-[0_0_20px_#10b981] transition flex items-center justify-center gap-2 text-lg border border-green-400/30"><i class="fab fa-whatsapp text-2xl"></i> CHECKOUT</button>
+        <div class="border-t p-4 bg-gray-50 dark:bg-gray-700">
+            <div class="flex justify-between items-center mb-2 text-sm"><span class="text-gray-600 dark:text-gray-300">Subtotal:</span><span id="cartSubtotal" class="font-bold dark:text-white">₹0</span></div>
+            <div class="flex justify-between items-center mb-2 text-sm"><span class="text-gray-600 dark:text-gray-300">Delivery Charge:</span><span id="cartDeliveryCharge" class="font-bold text-red-500">₹40</span></div>
+            <div class="flex justify-between items-center mb-4 text-lg border-t pt-2 dark:border-gray-600"><span class="font-bold dark:text-white">Total Amount:</span><span id="cartTotal" class="font-bold text-blue-600 text-xl">0</span></div>
+            <button onclick="checkoutWhatsApp()" class="w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition flex items-center justify-center gap-2 text-lg"><i class="fab fa-whatsapp text-2xl"></i> Order on WhatsApp</button>
         </div>
     </div>
 
+    <a href="https://wa.me/919140781523" target="_blank" class="floating-whatsapp bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition"><i class="fab fa-whatsapp text-3xl"></i></a>
+
+    <footer class="bg-gray-900 text-white mt-16"><div class="container mx-auto px-4 py-12 text-center"><p class="text-gray-400 text-sm">&copy; 2024 JugadTeck. All rights reserved. | +91 9140781523 | jugadteck.tech@gmail.com</p></div></footer>
+
     <script src="products.js"></script>
     <script>
-        // --- 3D BACKGROUND (Three.js Network Effect) ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Particles
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 800; // Optimized count
-        const posArray = new Float32Array(particlesCount * 3);
-        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 15; }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({ size: 0.03, color: 0x00f3ff, transparent: true, opacity: 0.8 });
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        // Lines connecting particles (Circuit effect)
-        const linesMaterial = new THREE.LineBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.15 });
-        const linesGeometry = new THREE.BufferGeometry();
-        const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
-        scene.add(linesMesh);
-
-        camera.position.z = 4;
-
-        let mouseX = 0; let mouseY = 0;
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            particlesMesh.rotation.y += 0.0005;
-            particlesMesh.rotation.x += 0.0002;
-            
-            // Update lines based on particle positions (Simple distance check for performance)
-            // Note: For 800 particles, full N^2 check is heavy. We'll just rotate the whole group for performance.
-            linesMesh.rotation.y = particlesMesh.rotation.y;
-            linesMesh.rotation.x = particlesMesh.rotation.x;
-
-            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
-            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
-            camera.lookAt(scene.position);
-
-            renderer.render(scene, camera);
-        }
-        animate();
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
-
-        // --- APP LOGIC ---
         let cart = JSON.parse(localStorage.getItem('jugadteck_cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('jugadteck_wishlist')) || [];
         let currentProduct = null;
+        let currentImageIndex = 0;
 
-        // Exit & Back Button Logic
-        window.addEventListener('beforeunload', function (e) { if (cart.length > 0) { e.preventDefault(); e.returnValue = 'Cart has items. Leave?'; } });
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+
+        window.addEventListener('beforeunload', function (e) { if (cart.length > 0) { e.preventDefault(); e.returnValue = 'Aapke cart mein items hain. Kya aap sach mein jaana chahte hain?'; } });
         window.addEventListener('popstate', function() {
             const cartSidebar = document.getElementById('cartSidebar');
             const productModal = document.getElementById('productDetailsModal');
@@ -294,47 +234,47 @@
             grid.innerHTML = products.map((p, i) => {
                 const isOutOfStock = p.quantity === 0;
                 const isLowStock = p.quantity > 0 && p.quantity <= 2;
-                const isWished = wishlist.includes(p.id);
                 
                 return `
-                <div class="product-card-3d glass rounded-2xl overflow-hidden relative group cursor-pointer" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" style="animation: fadeIn 0.5s ease-out ${i * 0.05}s backwards;" onclick="${isOutOfStock ? '' : `openProductDetails(${p.id})`}">
-                    <!-- Wishlist Button -->
-                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-20 bg-black/50 ${isWished ? 'text-red-500' : 'text-white'} hover:text-red-500 w-10 h-10 rounded-full flex items-center justify-center border border-cyan-500/30 backdrop-blur-sm transition">
-                        <i class="${isWished ? 'fas' : 'far'} fa-heart text-lg"></i>
+                <div class="product-card bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden fade-in relative ${isOutOfStock ? 'opacity-75' : ''}" style="animation-delay: ${i * 0.05}s">
+                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-10 bg-white dark:bg-gray-700 rounded-full p-2 shadow-md ${wishlist.includes(p.id) ? 'text-red-500' : 'text-gray-400'}">
+                        <i class="${wishlist.includes(p.id) ? 'fas' : 'far'} fa-heart text-xl"></i>
                     </button>
-
-                    ${isOutOfStock ? '<div class="absolute top-3 left-3 z-20 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg border border-red-400">OUT OF STOCK</div>' : ''}
-                    ${p.discount && !isOutOfStock ? '<div class="absolute top-3 left-3 z-20 bg-cyan-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold shadow-[0_0_10px_#00f3ff]">SALE</div>' : ''}
+                    ${isOutOfStock ? '<div class="absolute top-3 left-3 z-10 bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold">OUT OF STOCK</div>' : ''}
+                    ${p.discount && !isOutOfStock ? '<span class="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">SALE</span>' : ''}
                     
-                    <div class="relative h-56 bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-4 overflow-hidden card-img-container border-b border-cyan-500/10">
-                        <img src="${p.images ? p.images[0] : p.image}" class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] transition duration-500 group-hover:scale-110">
+                    <div class="relative h-64 bg-gray-100 dark:bg-gray-700 overflow-hidden group cursor-pointer" onclick="${isOutOfStock ? '' : `openProductDetails(${p.id})`}">
+                        <img src="${p.images ? p.images[0] : p.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     </div>
-                    
-                    <div class="p-5 card-content">
-                        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">${p.category}</span>
-                        <h3 class="font-bold text-lg mt-2 mb-3 text-white line-clamp-2">${p.name}</h3>
+                    <div class="p-5">
+                        <span class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase">${p.category}</span>
+                        <h3 class="font-bold text-lg mt-2 mb-2 text-gray-800 dark:text-white line-clamp-2">${p.name}</h3>
                         
-                        <div class="flex items-baseline gap-2 mb-4">
-                            <span class="text-2xl font-bold text-cyan-400 neon-text">₹${p.price}</span>
-                            ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-sm text-gray-500 line-through">₹${p.originalPrice}</span><span class="text-xs text-green-400 font-bold">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% off</span>` : ''}
+                        <div class="mt-3">
+                            <div class="flex items-baseline gap-2 flex-wrap">
+                                <span class="text-xl font-bold text-blue-900 dark:text-blue-400">₹${p.price}</span>
+                                ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-sm text-gray-500 line-through">₹${p.originalPrice}</span><span class="text-xs font-bold text-green-600">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% off</span>` : ''}
+                            </div>
+                            ${isLowStock ? '<p class="text-xs text-orange-600 font-bold mt-1"><i class="fas fa-fire mr-1"></i>Only ${p.quantity} left! Hurry!</p>' : ''}
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">Inclusive of all taxes</p>
                         </div>
-                        ${isLowStock ? '<p class="text-xs text-orange-400 font-bold mb-3 animate-pulse"><i class="fas fa-fire mr-1"></i>Only ${p.quantity} left!</p>' : ''}
 
-                        <button onclick="event.stopPropagation(); addToCart(${p.id})" class="w-full ${isOutOfStock ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'btn-neon text-white'} py-2 rounded-lg font-bold transition text-sm border border-cyan-500/30" ${isOutOfStock ? 'disabled' : ''}>
-                            <i class="fas fa-cart-plus mr-1"></i> ${isOutOfStock ? 'SOLD OUT' : 'ADD TO CART'}
-                        </button>
+                        <div class="flex items-center justify-end mt-3">
+                            <button onclick="event.stopPropagation(); addToCart(${p.id})" class="${isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white px-4 py-2 rounded-lg text-sm font-medium" ${isOutOfStock ? 'disabled' : ''}>
+                                <i class="fas fa-cart-plus mr-1"></i> ${isOutOfStock ? 'Sold Out' : 'Add'}
+                            </button>
+                        </div>
                     </div>
                 </div>`;
             }).join('');
-            
-            VanillaTilt.init(document.querySelectorAll(".product-card-3d"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
         function openProductDetails(id) {
             currentProduct = PRODUCTS.find(p => p.id === id);
             if (!currentProduct || currentProduct.quantity === 0) return;
+            currentImageIndex = 0;
             history.pushState({ productOpen: true }, '', '#product-' + id);
-            
+
             const images = currentProduct.images || [currentProduct.image];
             document.getElementById('detailImage').src = images[0];
             document.getElementById('detailCategory').textContent = currentProduct.category;
@@ -342,44 +282,47 @@
             document.getElementById('detailPrice').textContent = `${currentProduct.price}`;
             document.getElementById('detailDescription').textContent = currentProduct.description;
             
-            // Stock & Buttons
             const stockEl = document.getElementById('detailStockStatus');
             const btnBuy = document.getElementById('btnBuyNow');
             const btnCart = document.getElementById('btnAddCart');
             
             if (currentProduct.quantity === 0) {
-                stockEl.innerHTML = '<i class="fas fa-times-circle mr-1"></i>Out of Stock'; stockEl.className = 'text-sm font-bold text-red-500';
-                btnBuy.disabled = true; btnCart.disabled = true; btnBuy.classList.add('opacity-50'); btnCart.classList.add('opacity-50');
+                stockEl.innerHTML = '<i class="fas fa-times-circle mr-1 text-red-500"></i>Out of Stock';
+                stockEl.className = 'text-sm font-medium text-red-500';
+                btnBuy.disabled = true; btnBuy.classList.add('opacity-50', 'cursor-not-allowed');
+                btnCart.disabled = true; btnCart.classList.add('opacity-50', 'cursor-not-allowed');
             } else if (currentProduct.quantity <= 2) {
-                stockEl.innerHTML = `<i class="fas fa-fire mr-1"></i>Only ${currentProduct.quantity} left!`; stockEl.className = 'text-sm font-bold text-orange-400';
-                btnBuy.disabled = false; btnCart.disabled = false; btnBuy.classList.remove('opacity-50'); btnCart.classList.remove('opacity-50');
+                stockEl.innerHTML = `<i class="fas fa-fire mr-1 text-orange-500"></i>Only ${currentProduct.quantity} left in stock!`;
+                stockEl.className = 'text-sm font-medium text-orange-500';
+                btnBuy.disabled = false; btnBuy.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnCart.disabled = false; btnCart.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
-                stockEl.innerHTML = '<i class="fas fa-check-circle mr-1"></i>In Stock'; stockEl.className = 'text-sm font-bold text-green-400';
-                btnBuy.disabled = false; btnCart.disabled = false; btnBuy.classList.remove('opacity-50'); btnCart.classList.remove('opacity-50');
+                stockEl.innerHTML = '<i class="fas fa-check-circle mr-1 text-green-500"></i>In Stock';
+                stockEl.className = 'text-sm font-medium text-green-500';
+                btnBuy.disabled = false; btnBuy.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnCart.disabled = false; btnCart.classList.remove('opacity-50', 'cursor-not-allowed');
             }
 
-            // Price Discount
             const origEl = document.getElementById('detailOriginalPrice'), discEl = document.getElementById('detailDiscount');
             if (currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price) {
                 origEl.textContent = `₹${currentProduct.originalPrice}`; origEl.classList.remove('hidden');
                 discEl.textContent = `${Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100)}% off`; discEl.classList.remove('hidden');
             } else { origEl.classList.add('hidden'); discEl.classList.add('hidden'); }
 
-            // Specs Table
             const specsEl = document.getElementById('detailSpecifications');
             if (currentProduct.specifications) {
-                specsEl.innerHTML = currentProduct.specifications.split('\n').filter(s=>s.trim()).map(spec => {
+                specsEl.innerHTML = '<table class="specs-table">' + currentProduct.specifications.split('\n').filter(s=>s.trim()).map(spec => {
                     const parts = spec.split(':');
                     return parts.length >= 2 ? `<tr><td>${parts[0].replace('•','').trim()}</td><td>${parts.slice(1).join(':').trim()}</td></tr>` : `<tr><td colspan="2">${spec}</td></tr>`;
-                }).join('');
+                }).join('') + '</table>';
             }
 
-            // Thumbnails
-            document.getElementById('thumbnailContainer').innerHTML = images.map((img, idx) => `<img src="${img}" class="w-12 h-12 object-cover rounded border-2 ${idx===0?'border-cyan-400':'border-gray-700'} cursor-pointer hover:border-cyan-400 transition" onclick="document.getElementById('detailImage').src='${img}'; document.querySelectorAll('#thumbnailContainer img').forEach(i=>i.classList.replace('border-cyan-400','border-gray-700')); this.classList.replace('border-gray-700','border-cyan-400')">`).join('');
+            const thumbContainer = document.getElementById('thumbnailContainer');
+            thumbContainer.innerHTML = images.map((img, idx) => `<div class="thumbnail ${idx===0?'active':''}" onclick="changeImage('${img}', ${idx}, this)"><img src="${img}"></div>`).join('');
+            setupSwipe(images);
 
-            // Wishlist & Share Buttons Logic
             const wBtn = document.getElementById('modalWishlistBtn');
-            wBtn.className = `bg-black/50 ${wishlist.includes(id) ? 'text-red-500' : 'text-white'} hover:text-red-500 w-10 h-10 rounded-full flex items-center justify-center border border-cyan-500/30 backdrop-blur-sm transition`;
+            wBtn.className = `img-action-btn wishlist ${wishlist.includes(id) ? 'active' : ''}`;
             wBtn.innerHTML = `<i class="${wishlist.includes(id) ? 'fas' : 'far'} fa-heart"></i>`;
             wBtn.onclick = () => toggleWishlist(id);
             
@@ -388,23 +331,41 @@
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
 
-            // Related Products
+            // FIX: Related products ab quantity check ke bina bhi kaam karenge
             const related = PRODUCTS.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id && (p.quantity === undefined || p.quantity > 0)).slice(0, 3);
             document.getElementById('relatedProductsGrid').innerHTML = related.length > 0 ? related.map(p => `
-                <div class="glass p-3 rounded-xl border border-cyan-500/20 cursor-pointer hover:border-cyan-400 transition" onclick="openProductDetails(${p.id})">
-                    <img src="${p.images ? p.images[0] : p.image}" class="w-full h-20 object-contain rounded mb-2 bg-black/50">
-                    <p class="font-bold text-xs text-white line-clamp-2">${p.name}</p>
-                    <p class="text-cyan-400 font-bold text-sm mt-1">₹${p.price}</p>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-3 cursor-pointer hover:shadow-md transition" onclick="openProductDetails(${p.id})">
+                    <img src="${p.images ? p.images[0] : p.image}" class="w-full h-24 object-cover rounded mb-2">
+                    <p class="font-bold text-sm text-gray-800 dark:text-white line-clamp-2">${p.name}</p>
+                    <p class="text-blue-600 dark:text-blue-400 font-bold text-sm">₹${p.price}</p>
                 </div>
-            `).join('') : '<p class="text-gray-500 col-span-3 text-center text-sm">No related products.</p>';
-
-            // 3D Tilt for Modal Image
-            VanillaTilt.init(document.getElementById("tiltImageContainer"), { max: 15, speed: 400, glare: true, "max-glare": 0.3 });
+            `).join('') : '<p class="text-gray-500 col-span-3 text-center">No related products found.</p>';
 
             document.getElementById('productDetailsModal').classList.add('active');
             document.body.style.overflow = 'hidden';
             switchTab('description', document.querySelector('.tab-btn'));
             updateDeliveryProgress();
+        }
+
+        function setupSwipe(images) {
+            const container = document.getElementById('mainImageContainer');
+            let startX = 0;
+            container.ontouchstart = (e) => { startX = e.touches[0].clientX; };
+            container.ontouchend = (e) => {
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0 && currentImageIndex < images.length - 1) changeImage(images[currentImageIndex + 1], currentImageIndex + 1, document.querySelectorAll('.thumbnail')[currentImageIndex + 1]);
+                    else if (diff < 0 && currentImageIndex > 0) changeImage(images[currentImageIndex - 1], currentImageIndex - 1, document.querySelectorAll('.thumbnail')[currentImageIndex - 1]);
+                }
+            };
+        }
+
+        function changeImage(src, idx, thumbEl) {
+            currentImageIndex = idx;
+            document.getElementById('detailImage').src = src;
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            if(thumbEl) thumbEl.classList.add('active');
         }
 
         function closeProductDetails() {
@@ -415,10 +376,10 @@
         }
 
         function switchTab(tabName, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); });
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            btn.classList.add('active'); btn.classList.remove('text-gray-400');
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
         function toggleWishlist(id) {
@@ -428,7 +389,7 @@
             renderProducts(PRODUCTS);
             if (currentProduct && currentProduct.id === id) {
                 const wBtn = document.getElementById('modalWishlistBtn');
-                wBtn.className = `bg-black/50 ${wishlist.includes(id) ? 'text-red-500' : 'text-white'} hover:text-red-500 w-10 h-10 rounded-full flex items-center justify-center border border-cyan-500/30 backdrop-blur-sm transition`;
+                wBtn.className = `img-action-btn wishlist ${wishlist.includes(id) ? 'active' : ''}`;
                 wBtn.innerHTML = `<i class="${wishlist.includes(id) ? 'fas' : 'far'} fa-heart"></i>`;
             }
         }
@@ -439,12 +400,12 @@
             const isFree = total >= 1000 || count >= 8;
             const charge = isFree ? 0 : 40;
             let msg = "", progress = 0;
-            if (isFree) { msg = "FREE Delivery Unlocked!"; progress = 100; }
+            if (isFree) { msg = " FREE Delivery Unlocked!"; progress = 100; }
             else {
                 const moneyLeft = 1000 - total;
                 const itemsLeft = 8 - count;
-                if (moneyLeft <= itemsLeft * 125) { msg = `Add ₹${moneyLeft} more for FREE!`; progress = (total/1000)*100; }
-                else { msg = `Add ${itemsLeft} more item(s) for FREE!`; progress = (count/8)*100; }
+                if (moneyLeft <= itemsLeft * 125) { msg = `Add ₹${moneyLeft} more for FREE Delivery! 🚚`; progress = (total/1000)*100; }
+                else { msg = `Add ${itemsLeft} more item(s) for FREE Shipping! `; progress = (count/8)*100; }
             }
             return { charge, msg, progress, total, count };
         }
@@ -452,14 +413,13 @@
         function updateDeliveryProgress() {
             const info = getDeliveryInfo();
             document.getElementById('deliveryProgressBar').style.width = `${info.progress}%`;
-            document.getElementById('deliveryProgressBar').className = `h-2 rounded-full transition-all duration-500 shadow-[0_0_10px_#00f3ff] ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-500'}`;
+            document.getElementById('deliveryProgressBar').className = `h-2.5 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-blue-600'}`;
             document.getElementById('deliveryStatusText').textContent = info.msg;
-            
             document.getElementById('cartDeliveryBar').style.width = `${info.progress}%`;
-            document.getElementById('cartDeliveryBar').className = `h-2 rounded-full transition-all duration-500 shadow-[0_0_10px_#00f3ff] ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-500'}`;
+            document.getElementById('cartDeliveryBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-blue-600'}`;
             document.getElementById('cartDeliveryStatus').textContent = info.msg;
             document.getElementById('cartDeliveryCharge').textContent = info.charge === 0 ? 'FREE' : `₹${info.charge}`;
-            document.getElementById('cartDeliveryCharge').className = `font-bold ${info.charge === 0 ? 'text-green-400' : 'text-red-400'}`;
+            document.getElementById('cartDeliveryCharge').className = `font-bold ${info.charge === 0 ? 'text-green-500' : 'text-red-500'}`;
         }
 
         function addToCart(id) {
@@ -475,30 +435,36 @@
         function updateQty(id, change) {
             const item = cart.find(x => x.id === id);
             const p = PRODUCTS.find(x => x.id === id);
-            if (item) { item.quantity += change; if (item.quantity <= 0) removeFromCart(id); else if (p && item.quantity > p.quantity) item.quantity = p.quantity; saveCart(); }
+            if (item) { 
+                item.quantity += change; 
+                if (item.quantity <= 0) removeFromCart(id); 
+                else if (p && item.quantity > p.quantity) item.quantity = p.quantity; 
+                saveCart(); 
+            }
         }
         function saveCart() { localStorage.setItem('jugadteck_cart', JSON.stringify(cart)); updateCartUI(); }
 
         function updateCartUI() {
             const info = getDeliveryInfo();
             document.getElementById('cartCount').textContent = info.count;
+            document.getElementById('cartCountModal').textContent = info.count;
             document.getElementById('cartSubtotal').textContent = `₹${info.total}`;
             document.getElementById('cartTotal').textContent = `₹${info.total + info.charge}`;
             updateDeliveryProgress();
 
             const itemsEl = document.getElementById('cartItems');
-            if (cart.length === 0) itemsEl.innerHTML = '<div class="text-center text-gray-500 mt-20"><i class="fas fa-shopping-basket text-6xl mb-4 text-cyan-500/30"></i><p class="text-lg">Cart is Empty</p></div>';
+            if (cart.length === 0) itemsEl.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400 mt-12"><i class="fas fa-shopping-basket text-6xl text-gray-300 mb-4"></i><p>Your cart is empty</p></div>';
             else itemsEl.innerHTML = cart.map(item => `
-                <div class="flex gap-4 glass p-3 rounded-xl border border-cyan-500/10">
-                    <img src="${item.image}" class="w-16 h-16 object-cover rounded bg-black border border-cyan-500/20">
+                <div class="flex gap-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <img src="${item.image}" class="w-20 h-20 object-cover rounded">
                     <div class="flex-1">
-                        <h4 class="font-bold text-white text-sm">${item.name}</h4>
-                        <p class="text-cyan-400 font-bold">₹${item.price}</p>
+                        <h4 class="font-bold text-gray-800 dark:text-white text-sm">${item.name}</h4>
+                        <p class="text-blue-600 dark:text-blue-400 font-bold">₹${item.price}</p>
                         <div class="flex items-center gap-3 mt-2">
-                            <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 rounded bg-gray-800 hover:bg-cyan-600 flex items-center justify-center text-xs border border-cyan-500/30"><i class="fas fa-minus"></i></button>
-                            <span class="font-bold w-6 text-center text-white">${item.quantity}</span>
-                            <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 rounded bg-gray-800 hover:bg-cyan-600 flex items-center justify-center text-xs border border-cyan-500/30"><i class="fas fa-plus"></i></button>
-                            <button onclick="removeFromCart(${item.id})" class="ml-auto text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                            <button onclick="updateQty(${item.id}, -1)" class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center"><i class="fas fa-minus text-xs"></i></button>
+                            <span class="font-bold w-6 text-center dark:text-white">${item.quantity}</span>
+                            <button onclick="updateQty(${item.id}, 1)" class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center"><i class="fas fa-plus text-xs"></i></button>
+                            <button onclick="removeFromCart(${item.id})" class="ml-auto text-red-500"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -523,12 +489,13 @@
             const info = getDeliveryInfo();
             let msg = `*NEW ORDER - JugadTeck*%0A%0A`;
             cart.forEach((item, i) => { msg += `${i+1}. *${item.name}* (Qty: ${item.quantity}) - ₹${item.price * item.quantity}%0A`; });
-            msg += `%0A*Subtotal:* ₹${info.total}%0A*Delivery:* ${info.charge === 0 ? 'FREE' : '₹'+info.charge}%0A*TOTAL:* ₹${info.total + info.charge}%0A%0APlease confirm.`;
+            msg += `%0A*Subtotal:* ₹${info.total}%0A*Delivery:* ${info.charge === 0 ? 'FREE' : ''+info.charge}%0A*TOTAL:* ₹${info.total + info.charge}%0A%0APlease confirm my order.`;
             window.open(`https://wa.me/919140781523?text=${msg}`, '_blank');
         }
         function filterProducts(cat) {
-            document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-cyan-500/20', 'text-white'); b.classList.add('text-cyan-300'); });
-            event.target.classList.remove('text-cyan-300'); event.target.classList.add('bg-cyan-500/20', 'text-white');
+            document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-blue-600', 'text-white'); b.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300'); });
+            event.target.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+            event.target.classList.add('bg-blue-600', 'text-white');
             renderProducts(cat === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === cat));
         }
     </script>
