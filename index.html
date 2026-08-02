@@ -30,10 +30,8 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s; }
         
-        /* Scrollable Content */
         .scrollable-content { max-height: 220px; overflow-y: auto; padding-right: 10px; }
-        /* FIX: Specifications ke liye 12 lines (approx 300px) */
-        #tab-specifications .scrollable-content { max-height: 300px; }
+        #tab-specifications .scrollable-content { max-height: 300px; } /* 12 lines */
         
         .scrollable-content::-webkit-scrollbar { width: 6px; }
         .scrollable-content::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
@@ -51,6 +49,26 @@
         .specs-table td:first-child { font-weight: 600; color: #374151; width: 40%; background: #f9fafb; }
         .dark .specs-table td:first-child { background: #1f2937; color: #e5e7eb; }
         .dark .specs-table td:last-child { color: #d1d5db; }
+
+        /* Search Dropdown Styles */
+        #searchDropdown {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        #searchDropdown::-webkit-scrollbar { width: 6px; }
+        #searchDropdown::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+
+        /* Notification Toast */
+        #notificationToast {
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+        #notificationToast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -63,9 +81,17 @@
                     <div class="logo-container"><img src="logo.png" alt="JugadTeck"></div>
                     <div class="hidden md:block"><h1 class="text-2xl font-bold text-blue-900 dark:text-blue-400">JUGADTECK</h1><p class="text-xs text-gray-600 dark:text-gray-400">From Concept to Circuit</p></div>
                 </div>
-                <div class="flex-1 max-w-xl mx-8 hidden md:block">
-                    <div class="relative"><input type="text" id="searchInput" placeholder="Search products..." class="w-full pl-12 pr-4 py-2 rounded-full border-2 border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-600 outline-none"><i class="fas fa-search absolute left-4 top-3 text-gray-400"></i></div>
+                
+                <!-- SEARCH BAR WITH DROPDOWN -->
+                <div class="relative flex-1 max-w-xl mx-8 hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Search products (e.g., Arduino, Sensor)..." autocomplete="off" class="w-full pl-12 pr-4 py-2 rounded-full border-2 border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-600 outline-none transition">
+                        <i class="fas fa-search absolute left-4 top-3 text-gray-400"></i>
+                    </div>
+                    <!-- Live Search Dropdown -->
+                    <div id="searchDropdown" class="absolute top-full left-0 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border dark:border-gray-700 hidden z-50"></div>
                 </div>
+
                 <div class="flex items-center gap-4">
                     <button onclick="toggleDarkMode()" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition"><i class="fas fa-moon dark:hidden text-xl"></i><i class="fas fa-sun hidden dark:inline text-xl"></i></button>
                     <a href="admin.html" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition" title="Admin Login"><i class="fas fa-user-shield text-xl"></i></a>
@@ -140,7 +166,7 @@
                     </div>
                     <h1 id="detailTitle" class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white leading-tight mb-3"></h1>
                     <div class="flex items-center gap-3 mb-4 flex-wrap">
-                        <span id="detailStockStatus" class="text-sm font-medium"><i class="fas fa-check-circle mr-1"></i>In Stock</span>
+                        <span id="detailStockStatus" class="text-sm font-medium"><i class="fas fa-check-circle mr-1 text-green-500"></i>In Stock</span>
                     </div>
                     
                     <div class="border-t border-b py-4 mb-4 dark:border-gray-700">
@@ -173,11 +199,7 @@
                     <div class="tab-content active" id="tab-description"><h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">About this item</h3><div class="scrollable-content text-gray-600 dark:text-gray-300 leading-relaxed" id="detailDescription"></div></div>
                     <div class="tab-content" id="tab-specifications"><h3 class="font-bold text-lg mb-3 text-gray-800 dark:text-white">Product Specifications</h3><div class="scrollable-content bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700" id="detailSpecifications"></div></div>
 
-                    <!-- RELATED PRODUCTS -->
-                    <div class="mt-12">
-                        <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Related Products</h3>
-                        <div id="relatedProductsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
-                    </div>
+                    <div class="mt-12"><h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Related Products</h3><div id="relatedProductsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div></div>
                 </div>
             </div>
         </div>
@@ -197,6 +219,12 @@
             <div class="flex justify-between items-center mb-4 text-lg border-t pt-2 dark:border-gray-600"><span class="font-bold dark:text-white">Total Amount:</span><span id="cartTotal" class="font-bold text-blue-600 text-xl">0</span></div>
             <button onclick="checkoutWhatsApp()" class="w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition flex items-center justify-center gap-2 text-lg"><i class="fab fa-whatsapp text-2xl"></i> Order on WhatsApp</button>
         </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notificationToast" class="fixed bottom-24 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-2xl z-[70] flex items-center gap-3 font-bold">
+        <i class="fas fa-check-circle text-xl"></i>
+        <span id="notificationText">Item added to cart!</span>
     </div>
 
     <a href="https://wa.me/919140781523" target="_blank" class="floating-whatsapp bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition"><i class="fab fa-whatsapp text-3xl"></i></a>
@@ -221,12 +249,51 @@
             else if (productModal.classList.contains('active')) closeProductDetails();
         });
 
+        // --- SMART SEARCH LOGIC ---
+        const searchInput = document.getElementById('searchInput');
+        const searchDropdown = document.getElementById('searchDropdown');
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            if (term.length === 0) {
+                searchDropdown.classList.add('hidden');
+                renderProducts(PRODUCTS);
+                return;
+            }
+
+            const matches = PRODUCTS.filter(p => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term));
+            
+            if (matches.length > 0) {
+                searchDropdown.innerHTML = matches.slice(0, 6).map(p => `
+                    <div class="flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b dark:border-gray-700 last:border-0 transition" onclick="openProductDetails(${p.id}); document.getElementById('searchInput').value=''; document.getElementById('searchDropdown').classList.add('hidden'); renderProducts(PRODUCTS);">
+                        <img src="${p.images ? p.images[0] : p.image}" class="w-12 h-12 object-cover rounded border dark:border-gray-600">
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-sm text-gray-800 dark:text-white truncate">${p.name}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${p.category} ${p.quantity === 0 ? '<span class="text-red-500 font-bold">(Out of Stock)</span>' : ''}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-blue-600 dark:text-blue-400 block">₹${p.price}</span>
+                            ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-xs text-gray-500 line-through">₹${p.originalPrice}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                searchDropdown.classList.remove('hidden');
+            } else {
+                searchDropdown.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm"><i class="fas fa-search mr-2"></i>No products found.</div>';
+                searchDropdown.classList.remove('hidden');
+            }
+            renderProducts(matches);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#searchInput') && !e.target.closest('#searchDropdown')) {
+                searchDropdown.classList.add('hidden');
+            }
+        });
+        // --------------------------
+
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { renderProducts(PRODUCTS); updateCartUI(); }, 500);
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                renderProducts(PRODUCTS.filter(p => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term)));
-            });
         });
 
         function renderProducts(products) {
@@ -253,7 +320,7 @@
                         <div class="mt-3">
                             <div class="flex items-baseline gap-2 flex-wrap">
                                 <span class="text-xl font-bold text-blue-900 dark:text-blue-400">₹${p.price}</span>
-                                ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-sm text-gray-500 line-through">₹${p.originalPrice}</span><span class="text-xs font-bold text-green-600">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% off</span>` : ''}
+                                ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-sm text-gray-500 line-through">${p.originalPrice}</span><span class="text-xs font-bold text-green-600">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% off</span>` : ''}
                             </div>
                             ${isLowStock ? '<p class="text-xs text-orange-600 font-bold mt-1"><i class="fas fa-fire mr-1"></i>Only ${p.quantity} left! Hurry!</p>' : ''}
                             <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">Inclusive of all taxes</p>
@@ -279,7 +346,7 @@
             document.getElementById('detailImage').src = images[0];
             document.getElementById('detailCategory').textContent = currentProduct.category;
             document.getElementById('detailTitle').textContent = currentProduct.name;
-            document.getElementById('detailPrice').textContent = `${currentProduct.price}`;
+            document.getElementById('detailPrice').textContent = `₹${currentProduct.price}`;
             document.getElementById('detailDescription').textContent = currentProduct.description;
             
             const stockEl = document.getElementById('detailStockStatus');
@@ -287,18 +354,15 @@
             const btnCart = document.getElementById('btnAddCart');
             
             if (currentProduct.quantity === 0) {
-                stockEl.innerHTML = '<i class="fas fa-times-circle mr-1 text-red-500"></i>Out of Stock';
-                stockEl.className = 'text-sm font-medium text-red-500';
+                stockEl.innerHTML = '<i class="fas fa-times-circle mr-1 text-red-500"></i>Out of Stock'; stockEl.className = 'text-sm font-medium text-red-500';
                 btnBuy.disabled = true; btnBuy.classList.add('opacity-50', 'cursor-not-allowed');
                 btnCart.disabled = true; btnCart.classList.add('opacity-50', 'cursor-not-allowed');
             } else if (currentProduct.quantity <= 2) {
-                stockEl.innerHTML = `<i class="fas fa-fire mr-1 text-orange-500"></i>Only ${currentProduct.quantity} left in stock!`;
-                stockEl.className = 'text-sm font-medium text-orange-500';
+                stockEl.innerHTML = `<i class="fas fa-fire mr-1 text-orange-500"></i>Only ${currentProduct.quantity} left in stock!`; stockEl.className = 'text-sm font-medium text-orange-500';
                 btnBuy.disabled = false; btnBuy.classList.remove('opacity-50', 'cursor-not-allowed');
                 btnCart.disabled = false; btnCart.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
-                stockEl.innerHTML = '<i class="fas fa-check-circle mr-1 text-green-500"></i>In Stock';
-                stockEl.className = 'text-sm font-medium text-green-500';
+                stockEl.innerHTML = '<i class="fas fa-check-circle mr-1 text-green-500"></i>In Stock'; stockEl.className = 'text-sm font-medium text-green-500';
                 btnBuy.disabled = false; btnBuy.classList.remove('opacity-50', 'cursor-not-allowed');
                 btnCart.disabled = false; btnCart.classList.remove('opacity-50', 'cursor-not-allowed');
             }
@@ -331,7 +395,6 @@
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
 
-            // FIX: Related products ab quantity check ke bina bhi kaam karenge
             const related = PRODUCTS.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id && (p.quantity === undefined || p.quantity > 0)).slice(0, 3);
             document.getElementById('relatedProductsGrid').innerHTML = related.length > 0 ? related.map(p => `
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-3 cursor-pointer hover:shadow-md transition" onclick="openProductDetails(${p.id})">
@@ -422,14 +485,37 @@
             document.getElementById('cartDeliveryCharge').className = `font-bold ${info.charge === 0 ? 'text-green-500' : 'text-red-500'}`;
         }
 
+        // --- FIXED ADD TO CART LOGIC ---
         function addToCart(id) {
             const p = PRODUCTS.find(x => x.id === id);
             if (!p || p.quantity === 0) return;
+            
             const existing = cart.find(x => x.id === id);
-            if (existing) { if(existing.quantity < p.quantity) existing.quantity++; } 
-            else cart.push({ id: p.id, name: p.name, price: p.price, image: p.images ? p.images[0] : p.image, quantity: 1 });
+            if (existing) { 
+                if(existing.quantity < p.quantity) existing.quantity++; 
+                else return showNotification('Maximum stock limit reached!', 'red');
+            } else {
+                cart.push({ id: p.id, name: p.name, price: p.price, image: p.images ? p.images[0] : p.image, quantity: 1 });
+            }
             saveCart();
+            showNotification(`${p.name} added to cart!`, 'green');
         }
+
+        function addToCartFromDetails() { 
+            if (currentProduct && currentProduct.quantity > 0) { 
+                addToCart(currentProduct.id); 
+                // Force open cart without pushing history to avoid back button bugs
+                document.getElementById('cartSidebar').classList.add('open');
+            } 
+        }
+
+        function showNotification(msg, color = 'green') {
+            const toast = document.getElementById('notificationToast');
+            document.getElementById('notificationText').textContent = msg;
+            toast.className = `fixed bottom-24 right-6 bg-${color}-500 text-white px-6 py-3 rounded-lg shadow-2xl z-[70] flex items-center gap-3 font-bold show`;
+            setTimeout(() => { toast.classList.remove('show'); }, 2500);
+        }
+        // -----------------------------
 
         function removeFromCart(id) { cart = cart.filter(x => x.id !== id); saveCart(); }
         function updateQty(id, change) {
@@ -473,12 +559,11 @@
 
         function toggleCart(forceState) {
             const s = document.getElementById('cartSidebar');
-            if (forceState === true) { s.classList.add('open'); history.pushState({ cartOpen: true }, ''); } 
+            if (forceState === true) { s.classList.add('open'); } 
             else if (forceState === false) { s.classList.remove('open'); } 
-            else { if (s.classList.contains('open')) { s.classList.remove('open'); } else { s.classList.add('open'); history.pushState({ cartOpen: true }, ''); } }
+            else { s.classList.toggle('open'); }
         }
         
-        function addToCartFromDetails() { if (currentProduct && currentProduct.quantity > 0) { addToCart(currentProduct.id); toggleCart(true); } }
         function buyNowWhatsApp() {
             if (!currentProduct) return;
             const msg = `*NEW ORDER*%0A%0A*Product:* ${currentProduct.name}%0A*Price:* ₹${currentProduct.price}%0A%0APlease confirm.`;
