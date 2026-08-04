@@ -16,13 +16,10 @@
         
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; background: #02020a; color: #e2e8f0; }
         
-        /* 3D Background Canvas */
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         
-        /* Glassmorphism */
         .glass { background: rgba(10, 10, 30, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
         
-        /* 3D Card Styles */
         .product-card-3d { 
             background: rgba(20, 20, 40, 0.8); 
             border: 1px solid rgba(255, 255, 255, 0.05); 
@@ -67,7 +64,6 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- 3D Background Canvas -->
     <canvas id="bg-canvas"></canvas>
 
     <!-- Header -->
@@ -246,20 +242,17 @@
 
     <script src="products.js"></script>
     <script>
-        // --- 3D BACKGROUND (Restored Bright Cyan Network) ---
+        // --- 3D BACKGROUND ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // Bright Cyan Particles
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1000; // Increased count for richer look
+        const particlesCount = 1000; 
         const posArray = new Float32Array(particlesCount * 3);
-        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 25; } // Spread wider
+        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 25; } 
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        
-        // Bright Cyan Color (#00f3ff)
         const particlesMaterial = new THREE.PointsMaterial({ size: 0.04, color: 0x00f3ff, transparent: true, opacity: 0.8 });
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
@@ -270,9 +263,9 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            particlesMesh.rotation.y += 0.0005; // Faster rotation
+            particlesMesh.rotation.y += 0.0005; 
             particlesMesh.rotation.x += 0.0002;
-            camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.05; // More movement
+            camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.05; 
             camera.position.y += (mouseY * 1.5 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
             renderer.render(scene, camera);
@@ -286,11 +279,19 @@
         let currentProduct = null;
         let currentImageIndex = 0;
 
-        window.addEventListener('popstate', function() {
+        // FIXED BACK BUTTON LOGIC
+        window.addEventListener('popstate', function(event) {
             const cartSidebar = document.getElementById('cartSidebar');
-            const modal = document.getElementById('productDetailsModal');
-            if (cartSidebar.classList.contains('open')) cartSidebar.classList.remove('open');
-            else if (modal.classList.contains('active')) closeProductDetails();
+            const productModal = document.getElementById('productDetailsModal');
+            
+            // Priority: Close Cart first, then Product Modal
+            if (cartSidebar.classList.contains('open')) {
+                cartSidebar.classList.remove('open');
+            } else if (productModal.classList.contains('active')) {
+                productModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                currentProduct = null;
+            }
         });
 
         // Search
@@ -331,8 +332,11 @@
                 const lowStock = p.quantity > 0 && p.quantity <= 2;
                 const wished = wishlist.includes(p.id);
                 
+                // FULL CARD CLICKABLE LOGIC
                 return `
-                <div class="product-card-3d rounded-xl overflow-hidden relative ${outOfStock ? 'opacity-75' : ''}" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
+                <div class="product-card-3d rounded-xl overflow-hidden relative ${outOfStock ? 'opacity-75' : ''} cursor-pointer" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1" onclick="openProductDetails(${p.id})">
+                    
+                    <!-- Buttons with stopPropagation so they don't open product -->
                     <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-10 bg-black/60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/80 transition card-content border border-gray-700">
                         <i class="${wished ? 'fas text-red-500' : 'far'} fa-heart"></i>
                     </button>
@@ -340,7 +344,7 @@
                     ${outOfStock ? '<span class="absolute top-3 left-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content border border-gray-600">OUT OF STOCK</span>' : ''}
                     ${p.discount && !outOfStock ? '<span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content shadow-[0_0_10px_rgba(239,68,68,0.5)]">SALE</span>' : ''}
                     
-                    <div class="relative h-48 bg-slate-800 overflow-hidden cursor-pointer card-img-container" onclick="${outOfStock ? '' : `openProductDetails(${p.id})`}">
+                    <div class="relative h-48 bg-slate-800 overflow-hidden card-img-container">
                         <img src="${p.images?.[0] || p.image}" class="w-full h-full object-cover transition duration-500 hover:scale-110">
                     </div>
                     
@@ -370,7 +374,8 @@
             if (!currentProduct || currentProduct.quantity === 0) return;
             
             currentImageIndex = 0;
-            history.pushState({ productOpen: true }, '', '#product-' + id);
+            // Push state for back button navigation
+            history.pushState({ view: 'product' }, '', '#product');
             
             const images = currentProduct.images || [currentProduct.image];
             document.getElementById('detailImage').src = images[0];
@@ -413,9 +418,10 @@
             const wBtn = document.getElementById('modalWishlistBtn');
             const wished = wishlist.includes(id);
             wBtn.innerHTML = `<i class="${wished ? 'fas text-red-500' : 'far text-white'} fa-heart"></i>`;
-            wBtn.onclick = () => toggleWishlist(id);
+            wBtn.onclick = (e) => { e.stopPropagation(); toggleWishlist(id); };
             
-            document.getElementById('modalShareBtn').onclick = () => {
+            document.getElementById('modalShareBtn').onclick = (e) => {
+                e.stopPropagation();
                 const msg = `Check out ${currentProduct.name} on JugadTeck! Price: ₹${currentProduct.price}. Link: ${window.location.href}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
@@ -447,10 +453,14 @@
         }
 
         function closeProductDetails() {
-            document.getElementById('productDetailsModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-            currentProduct = null;
-            if (window.location.hash.startsWith('#product-')) history.back();
+            const modal = document.getElementById('productDetailsModal');
+            if(modal.classList.contains('active')){
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                currentProduct = null;
+                // Go back in history to remove the #product hash
+                if(window.location.hash === '#product') history.back();
+            }
         }
 
         function switchTab(tab, btn) {
@@ -521,7 +531,7 @@
         function addToCartFromDetails() { 
             if (currentProduct && currentProduct.quantity > 0) { 
                 addToCart(currentProduct.id); 
-                document.getElementById('cartSidebar').classList.add('open');
+                toggleCart(true); 
             } 
         }
 
@@ -562,7 +572,7 @@
                         <img src="${item.image}" class="w-16 h-16 object-cover rounded border border-gray-600">
                         <div class="flex-1">
                             <h4 class="font-medium text-white text-sm">${item.name}</h4>
-                            <p class="text-cyan-400 font-semibold">₹${item.price}</p>
+                            <p class="text-cyan-400 font-semibold">${item.price}</p>
                             <div class="flex items-center gap-2 mt-2">
                                 <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 flex items-center justify-center text-xs"><i class="fas fa-minus"></i></button>
                                 <span class="font-medium text-white w-6 text-center">${item.quantity}</span>
@@ -574,13 +584,23 @@
                 `).join('');
         }
 
+        // FIXED CART TOGGLE WITH HISTORY
         function toggleCart(forceState) {
             const s = document.getElementById('cartSidebar');
-            if (forceState === true) { s.classList.add('open'); history.pushState({ cartOpen: true }, ''); } 
-            else if (forceState === false) { s.classList.remove('open'); } 
-            else { 
-                if (s.classList.contains('open')) s.classList.remove('open'); 
-                else { s.classList.add('open'); history.pushState({ cartOpen: true }, ''); }
+            if (forceState === true) { 
+                s.classList.add('open'); 
+                history.pushState({ view: 'cart' }, '', '#cart'); 
+            } else if (forceState === false) { 
+                s.classList.remove('open'); 
+                if(window.location.hash === '#cart') history.back();
+            } else { 
+                if (s.classList.contains('open')) { 
+                    s.classList.remove('open'); 
+                    if(window.location.hash === '#cart') history.back();
+                } else { 
+                    s.classList.add('open'); 
+                    history.pushState({ view: 'cart' }, '', '#cart'); 
+                }
             }
         }
 
