@@ -5,54 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JugadTeck - Electronics Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { neon: '#06b6d4', darkBg: '#0f172a' } } } }</script>
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { neon: '#0891b2', darkBg: '#0f172a' } } } }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; background: #0f172a; color: #e2e8f0; }
         
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         
-        .glass { 
-            background: rgba(15, 23, 42, 0.7); 
-            backdrop-filter: blur(8px); 
-            border: 1px solid rgba(6, 182, 212, 0.15); 
-        }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(6, 182, 212, 0.15); }
         
-        .product-card { 
-            background: rgba(30, 41, 59, 0.8); 
-            border: 1px solid rgba(6, 182, 212, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .product-card:hover { 
-            transform: translateY(-4px); 
-            box-shadow: 0 10px 40px rgba(6, 182, 212, 0.15);
-            border-color: rgba(6, 182, 212, 0.3);
-        }
+        .product-card { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(6, 182, 212, 0.1); transition: all 0.3s; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: rgba(6, 182, 212, 0.3); }
         
-        .btn-primary { 
-            background: linear-gradient(135deg, #06b6d4, #0891b2); 
-            transition: all 0.3s;
-        }
-        .btn-primary:hover { 
-            background: linear-gradient(135deg, #0891b2, #0e7490);
-            transform: translateY(-1px);
-        }
+        .btn-primary { background: linear-gradient(135deg, #0891b2, #0e7490); transition: all 0.3s; }
+        .btn-primary:hover { background: linear-gradient(135deg, #0e7490, #155e75); transform: translateY(-1px); }
         
-        .cart-sidebar { transform: translateX(100%); transition: transform 0.3s ease-in-out; }
+        .cart-sidebar { transform: translateX(100%); transition: transform 0.3s; }
         .cart-sidebar.open { transform: translateX(0); }
         
         #productDetailsModal { display: none; }
         #productDetailsModal.active { display: block; }
         
-        .tab-btn { padding: 10px 20px; font-weight: 600; color: #94a3b8; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
-        .tab-btn:hover { color: #e2e8f0; }
-        .tab-btn.active { color: #06b6d4; border-bottom-color: #06b6d4; }
+        .tab-btn { padding: 10px 20px; font-weight: 600; color: #94a3b8; border-bottom: 2px solid transparent; cursor: pointer; }
+        .tab-btn.active { color: #22d3ee; border-bottom-color: #22d3ee; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        .scrollable-content { max-height: 250px; overflow-y: auto; padding-right: 8px; }
+        .scrollable-content { max-height: 250px; overflow-y: auto; }
         .scrollable-content::-webkit-scrollbar { width: 6px; }
         .scrollable-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         
@@ -62,7 +43,10 @@
         .specs-table td:first-child { color: #94a3b8; width: 40%; font-weight: 600; }
         .specs-table td:last-child { color: #cbd5e1; }
         
-        #notificationToast { transform: translateY(100px); opacity: 0; transition: all 0.3s; pointer-events: none; }
+        .img-action-btn { position: absolute; top: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .img-action-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.1); }
+        
+        #notificationToast { transform: translateY(100px); opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 100; }
         #notificationToast.show { transform: translateY(0); opacity: 1; }
     </style>
 </head>
@@ -79,13 +63,13 @@
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
                             <img src="logo.png" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-sm font-bold text-white\'>JT</span>'">
                         </div>
-                        <div>
+                        <div class="hidden md:block">
                             <h1 class="text-xl font-bold text-white">JUGADTECK</h1>
                             <p class="text-xs text-cyan-400">From Concept to Circuit</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <a href="admin.html" class="text-gray-400 hover:text-cyan-400 transition text-lg hidden sm:block"><i class="fas fa-user-shield"></i></a>
+                        <a href="admin.html" class="text-gray-400 hover:text-cyan-400 transition text-lg"><i class="fas fa-user-shield"></i></a>
                         <button onclick="toggleCart()" class="relative btn-primary text-white px-4 py-2 rounded-full font-semibold text-sm">
                             <i class="fas fa-shopping-cart mr-2"></i>Cart
                             <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
@@ -94,7 +78,7 @@
                 </div>
                 
                 <div class="relative w-full">
-                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off" class="w-full pl-10 pr-4 py-2 rounded-full bg-slate-800/80 border border-cyan-500/20 text-white placeholder-gray-400 focus:border-cyan-500/40 focus:outline-none transition">
+                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off" class="w-full pl-10 pr-4 py-2 rounded-full bg-slate-800/80 border border-cyan-500/20 text-white placeholder-gray-400 focus:border-cyan-500/40 focus:outline-none">
                     <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
                     <div id="searchDropdown" class="absolute top-full left-0 w-full mt-2 glass rounded-xl shadow-xl hidden z-50 max-h-96 overflow-y-auto"></div>
                 </div>
@@ -123,6 +107,7 @@
             <button onclick="filterProducts('Sensors')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Sensors</button>
             <button onclick="filterProducts('Modules')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Modules</button>
             <button onclick="filterProducts('Project Kit')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Project Kit</button>
+            <button onclick="filterProducts('Projects')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Projects</button>
         </div>
         <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
     </section>
@@ -131,7 +116,7 @@
     <div id="productDetailsModal" class="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm">
         <div class="min-h-screen px-4 py-8 flex items-center justify-center">
             <div class="glass rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto border border-cyan-500/20">
-                <div class="sticky top-0 bg-slate-900/95 backdrop-blur border-b border-cyan-500/20 p-4 flex justify-between items-center z-10">
+                <div class="sticky top-0 bg-slate-900/95 backdrop-blur border-b border-cyan-500/20 p-4 flex justify-between items-center z-20">
                     <button onclick="closeProductDetails()" class="text-gray-400 hover:text-white flex items-center gap-2">
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
@@ -142,7 +127,11 @@
                 </div>
                 
                 <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-cyan-500/10">
+                    <div class="relative bg-slate-800/50 rounded-xl p-4 border border-cyan-500/10">
+                        <div class="absolute top-4 right-4 flex gap-2 z-10">
+                            <button id="modalShareBtn" class="img-action-btn"><i class="fas fa-share-alt text-white"></i></button>
+                            <button id="modalWishlistBtn" class="img-action-btn"><i class="far fa-heart text-white"></i></button>
+                        </div>
                         <img id="detailImage" src="" alt="Product" class="w-full h-auto object-contain max-h-80">
                         <div class="flex gap-2 mt-4 overflow-x-auto" id="thumbnailContainer"></div>
                     </div>
@@ -162,6 +151,17 @@
                                 <span class="text-3xl font-bold text-white" id="detailPrice"></span>
                                 <span class="text-lg text-gray-500 line-through hidden" id="detailOriginalPrice"></span>
                                 <span class="text-sm text-green-400 font-semibold hidden" id="detailDiscount"></span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Inclusive of all taxes • Free delivery available</p>
+                        </div>
+
+                        <div class="bg-slate-800/30 p-3 rounded-lg border border-cyan-500/10">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-semibold text-cyan-400"><i class="fas fa-truck mr-1"></i>Free Delivery</span>
+                                <span class="text-xs text-cyan-400" id="deliveryStatusText">Add items to unlock</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div id="deliveryProgressBar" class="bg-cyan-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -183,7 +183,7 @@
 
                         <div class="pt-6 border-t border-gray-700">
                             <h3 class="text-lg font-semibold mb-4 text-white">Related Products</h3>
-                            <div id="relatedProductsGrid" class="grid grid-cols-2 gap-3"></div>
+                            <div id="relatedProductsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
                         </div>
                     </div>
                 </div>
@@ -197,6 +197,17 @@
             <h3 class="text-lg font-semibold text-white"><i class="fas fa-shopping-cart mr-2"></i>Cart</h3>
             <button onclick="toggleCart(false)" class="text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
         </div>
+        
+        <div class="p-3 border-b border-cyan-500/10 bg-slate-800/50">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-semibold text-cyan-400"><i class="fas fa-truck mr-1"></i>Free Delivery</span>
+                <span class="text-xs text-cyan-400" id="cartDeliveryStatus">Add items</span>
+            </div>
+            <div class="w-full bg-slate-700 rounded-full h-2">
+                <div id="cartDeliveryBar" class="bg-cyan-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
         <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
         <div class="p-4 border-t border-cyan-500/20 bg-slate-900/80">
             <div class="flex justify-between mb-2 text-sm"><span class="text-gray-400">Subtotal:</span><span id="cartSubtotal" class="font-semibold text-white">₹0</span></div>
@@ -219,25 +230,32 @@
 
     <script src="products.js"></script>
     <script>
-        // 3D Background - Simplified
+        // 3D Background
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 400;
+        const particlesCount = 500;
         const posArray = new Float32Array(particlesCount * 3);
         for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 15; }
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({ size: 0.02, color: 0x06b6d4, transparent: true, opacity: 0.6 });
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.025, color: 0x0891b2, transparent: true, opacity: 0.6 });
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
         camera.position.z = 4;
 
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = (e.clientX / window.innerWidth) * 2 - 1; mouseY = -(e.clientY / window.innerHeight) * 2 + 1; });
+
         function animate() {
             requestAnimationFrame(animate);
             particlesMesh.rotation.y += 0.0003;
+            particlesMesh.rotation.x += 0.0001;
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
             renderer.render(scene, camera);
         }
         animate();
@@ -246,6 +264,14 @@
         let cart = JSON.parse(localStorage.getItem('jugadteck_cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('jugadteck_wishlist')) || [];
         let currentProduct = null;
+        let currentImageIndex = 0;
+
+        window.addEventListener('popstate', function() {
+            const cartSidebar = document.getElementById('cartSidebar');
+            const modal = document.getElementById('productDetailsModal');
+            if (cartSidebar.classList.contains('open')) cartSidebar.classList.remove('open');
+            else if (modal.classList.contains('active')) closeProductDetails();
+        });
 
         // Search
         document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -255,12 +281,19 @@
             
             const matches = PRODUCTS.filter(p => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term));
             if (matches.length > 0) {
-                dropdown.innerHTML = matches.slice(0, 5).map(p => `
-                    <div class="flex items-center gap-3 p-3 hover:bg-slate-800 cursor-pointer border-b border-gray-700 last:border-0" onclick="openProductDetails(${p.id}); document.getElementById('searchInput').value=''; dropdown.classList.add('hidden');">
-                        <img src="${p.images?.[0] || p.image}" class="w-10 h-10 object-cover rounded">
-                        <div class="flex-1"><p class="font-medium text-white text-sm">${p.name}</p><p class="text-xs text-cyan-400">₹${p.price}</p></div>
+                dropdown.innerHTML = matches.slice(0, 6).map(p => `
+                    <div class="flex items-center gap-3 p-3 hover:bg-slate-800 cursor-pointer border-b border-gray-700 last:border-0" onclick="openProductDetails(${p.id}); document.getElementById('searchInput').value=''; dropdown.classList.add('hidden'); renderProducts(PRODUCTS);">
+                        <img src="${p.images?.[0] || p.image}" class="w-12 h-12 object-cover rounded border border-gray-600">
+                        <div class="flex-1">
+                            <p class="font-medium text-white text-sm">${p.name}</p>
+                            <p class="text-xs text-gray-400">${p.category} ${p.quantity === 0 ? '<span class="text-red-400">(Out of Stock)</span>' : ''}</p>
+                        </div>
+                        <span class="font-bold text-cyan-400">₹${p.price}</span>
                     </div>
                 `).join('');
+                dropdown.classList.remove('hidden');
+            } else {
+                dropdown.innerHTML = '<div class="p-4 text-center text-gray-400">No products found</div>';
                 dropdown.classList.remove('hidden');
             }
             renderProducts(matches);
@@ -276,21 +309,32 @@
             document.getElementById('productsGrid').innerHTML = products.map((p, i) => {
                 const outOfStock = p.quantity === 0;
                 const lowStock = p.quantity > 0 && p.quantity <= 2;
+                const wished = wishlist.includes(p.id);
+                
                 return `
-                <div class="product-card rounded-xl overflow-hidden ${outOfStock ? 'opacity-75' : ''}">
+                <div class="product-card rounded-xl overflow-hidden relative ${outOfStock ? 'opacity-75' : ''}">
+                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-10 bg-black/60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/80 transition">
+                        <i class="${wished ? 'fas text-red-500' : 'far'} fa-heart"></i>
+                    </button>
+                    
+                    ${outOfStock ? '<span class="absolute top-3 left-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-medium">OUT OF STOCK</span>' : ''}
+                    ${p.discount && !outOfStock ? '<span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-medium">SALE</span>' : ''}
+                    
                     <div class="relative h-48 bg-slate-800 overflow-hidden cursor-pointer" onclick="${outOfStock ? '' : `openProductDetails(${p.id})`}">
-                        <img src="${p.images?.[0] || p.image}" class="w-full h-full object-cover">
-                        ${p.discount && !outOfStock ? '<span class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">SALE</span>' : ''}
-                        ${outOfStock ? '<span class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">OUT OF STOCK</span>' : ''}
+                        <img src="${p.images?.[0] || p.image}" class="w-full h-full object-cover transition duration-500 hover:scale-110">
                     </div>
+                    
                     <div class="p-4">
                         <span class="text-xs text-cyan-400 font-semibold uppercase">${p.category}</span>
                         <h3 class="font-semibold text-white mt-1 mb-2 line-clamp-2">${p.name}</h3>
+                        
                         <div class="flex items-baseline gap-2 mb-3">
                             <span class="text-xl font-bold text-white">₹${p.price}</span>
-                            ${p.originalPrice ? `<span class="text-sm text-gray-500 line-through">₹${p.originalPrice}</span>` : ''}
+                            ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-sm text-gray-500 line-through">₹${p.originalPrice}</span><span class="text-xs text-green-400 font-semibold">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% off</span>` : ''}
                         </div>
-                        ${lowStock ? '<p class="text-xs text-orange-400 mb-2"><i class="fas fa-exclamation-triangle mr-1"></i>Only ${p.quantity} left</p>' : ''}
+                        
+                        ${lowStock ? '<p class="text-xs text-orange-400 mb-2"><i class="fas fa-exclamation-triangle mr-1"></i>Only ' + p.quantity + ' left!</p>' : ''}
+                        
                         <button onclick="event.stopPropagation(); addToCart(${p.id})" ${outOfStock ? 'disabled' : ''} class="w-full btn-primary text-white py-2 rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="fas fa-cart-plus mr-1"></i> ${outOfStock ? 'Sold Out' : 'Add to Cart'}
                         </button>
@@ -303,55 +347,96 @@
             currentProduct = PRODUCTS.find(p => p.id === id);
             if (!currentProduct || currentProduct.quantity === 0) return;
             
-            document.getElementById('detailImage').src = currentProduct.images?.[0] || currentProduct.image;
+            currentImageIndex = 0;
+            history.pushState({ productOpen: true }, '', '#product-' + id);
+            
+            const images = currentProduct.images || [currentProduct.image];
+            document.getElementById('detailImage').src = images[0];
             document.getElementById('detailCategory').textContent = currentProduct.category;
             document.getElementById('detailTitle').textContent = currentProduct.name;
             document.getElementById('detailPrice').textContent = `₹${currentProduct.price}`;
             document.getElementById('detailDescription').textContent = currentProduct.description;
             
+            // Stock status
             const stockEl = document.getElementById('detailStockStatus');
+            const btnBuy = document.getElementById('btnBuyNow');
+            const btnCart = document.getElementById('btnAddCart');
+            
             if (currentProduct.quantity <= 2) {
                 stockEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i>Only ${currentProduct.quantity} left!`;
                 stockEl.className = 'text-sm font-medium text-orange-400';
+            } else {
+                stockEl.innerHTML = '<i class="fas fa-check-circle mr-1"></i>In Stock';
+                stockEl.className = 'text-sm font-medium text-green-400';
             }
             
-            if (currentProduct.originalPrice) {
+            // Price & discount
+            if (currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price) {
                 document.getElementById('detailOriginalPrice').textContent = `₹${currentProduct.originalPrice}`;
                 document.getElementById('detailOriginalPrice').classList.remove('hidden');
                 const discount = Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100);
                 document.getElementById('detailDiscount').textContent = `${discount}% off`;
                 document.getElementById('detailDiscount').classList.remove('hidden');
+            } else {
+                document.getElementById('detailOriginalPrice').classList.add('hidden');
+                document.getElementById('detailDiscount').classList.add('hidden');
             }
             
+            // Specifications
             if (currentProduct.specifications) {
-                document.getElementById('detailSpecifications').innerHTML = currentProduct.specifications.split('\n').map(spec => {
+                document.getElementById('detailSpecifications').innerHTML = currentProduct.specifications.split('\n').filter(s => s.trim()).map(spec => {
                     const parts = spec.split(':');
-                    return parts.length >= 2 ? `<tr><td>${parts[0].trim()}</td><td>${parts[1].trim()}</td></tr>` : `<tr><td colspan="2">${spec}</td></tr>`;
+                    return parts.length >= 2 ? `<tr><td>${parts[0].replace('•','').trim()}</td><td>${parts.slice(1).join(':').trim()}</td></tr>` : `<tr><td colspan="2">${spec}</td></tr>`;
                 }).join('');
             }
             
-            document.getElementById('thumbnailContainer').innerHTML = (currentProduct.images || [currentProduct.image]).map((img, idx) => 
-                `<img src="${img}" class="w-16 h-16 object-cover rounded border-2 ${idx===0?'border-cyan-500':'border-gray-600'} cursor-pointer" onclick="document.getElementById('detailImage').src='${img}'">`
+            // Thumbnails
+            document.getElementById('thumbnailContainer').innerHTML = images.map((img, idx) => 
+                `<img src="${img}" class="w-16 h-16 object-cover rounded border-2 ${idx===0?'border-cyan-500':'border-gray-600'} cursor-pointer hover:border-cyan-500 transition flex-shrink-0" onclick="changeImage('${img}', ${idx})">`
             ).join('');
             
-            const related = PRODUCTS.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id && p.quantity > 0).slice(0, 4);
-            document.getElementById('relatedProductsGrid').innerHTML = related.map(p => `
-                <div class="bg-slate-800 rounded-lg p-3 cursor-pointer hover:bg-slate-700 transition" onclick="openProductDetails(${p.id})">
+            // Wishlist button
+            const wBtn = document.getElementById('modalWishlistBtn');
+            const wished = wishlist.includes(id);
+            wBtn.innerHTML = `<i class="${wished ? 'fas text-red-500' : 'far text-white'} fa-heart"></i>`;
+            wBtn.onclick = () => toggleWishlist(id);
+            
+            // Share button
+            document.getElementById('modalShareBtn').onclick = () => {
+                const msg = `Check out ${currentProduct.name} on JugadTeck! Price: ₹${currentProduct.price}. Link: ${window.location.href}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            };
+            
+            // Related products
+            const related = PRODUCTS.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id && (p.quantity === undefined || p.quantity > 0)).slice(0, 6);
+            document.getElementById('relatedProductsGrid').innerHTML = related.length > 0 ? related.map(p => `
+                <div class="bg-slate-800 rounded-lg p-3 cursor-pointer hover:bg-slate-700 transition border border-cyan-500/10" onclick="openProductDetails(${p.id})">
                     <img src="${p.images?.[0] || p.image}" class="w-full h-20 object-cover rounded mb-2">
                     <p class="font-medium text-white text-sm line-clamp-2">${p.name}</p>
-                    <p class="text-cyan-400 font-semibold text-sm">${p.price}</p>
+                    <p class="text-cyan-400 font-semibold text-sm mt-1">₹${p.price}</p>
                 </div>
-            `).join('');
+            `).join('') : '<p class="text-gray-500 col-span-2 text-center text-sm">No related products</p>';
             
             document.getElementById('productDetailsModal').classList.add('active');
             document.body.style.overflow = 'hidden';
             switchTab('description', document.querySelector('.tab-btn'));
+            updateDeliveryProgress();
+        }
+
+        function changeImage(src, idx) {
+            currentImageIndex = idx;
+            document.getElementById('detailImage').src = src;
+            document.querySelectorAll('#thumbnailContainer img').forEach((img, i) => {
+                img.classList.toggle('border-cyan-500', i === idx);
+                img.classList.toggle('border-gray-600', i !== idx);
+            });
         }
 
         function closeProductDetails() {
             document.getElementById('productDetailsModal').classList.remove('active');
             document.body.style.overflow = 'auto';
             currentProduct = null;
+            if (window.location.hash.startsWith('#product-')) history.back();
         }
 
         function switchTab(tab, btn) {
@@ -361,51 +446,106 @@
             document.getElementById(`tab-${tab}`).classList.add('active');
         }
 
+        function toggleWishlist(id) {
+            const idx = wishlist.indexOf(id);
+            if (idx > -1) wishlist.splice(idx, 1); else wishlist.push(id);
+            localStorage.setItem('jugadteck_wishlist', JSON.stringify(wishlist));
+            renderProducts(PRODUCTS);
+            
+            if (currentProduct && currentProduct.id === id) {
+                const wBtn = document.getElementById('modalWishlistBtn');
+                const wished = wishlist.includes(id);
+                wBtn.innerHTML = `<i class="${wished ? 'fas text-red-500' : 'far text-white'} fa-heart"></i>`;
+            }
+        }
+
+        function getDeliveryInfo() {
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const isFree = total >= 1000 || count >= 8;
+            const charge = isFree ? 0 : 40;
+            let msg = "", progress = 0;
+            
+            if (isFree) { msg = "FREE Delivery Unlocked!"; progress = 100; }
+            else {
+                const moneyLeft = 1000 - total;
+                const itemsLeft = 8 - count;
+                if (moneyLeft <= itemsLeft * 125) { msg = `Add ₹${moneyLeft} more for FREE!`; progress = (total/1000)*100; }
+                else { msg = `Add ${itemsLeft} more item(s) for FREE!`; progress = (count/8)*100; }
+            }
+            return { charge, msg, progress, total, count };
+        }
+
+        function updateDeliveryProgress() {
+            const info = getDeliveryInfo();
+            document.getElementById('deliveryProgressBar').style.width = `${info.progress}%`;
+            document.getElementById('deliveryProgressBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-600'}`;
+            document.getElementById('deliveryStatusText').textContent = info.msg;
+            
+            document.getElementById('cartDeliveryBar').style.width = `${info.progress}%`;
+            document.getElementById('cartDeliveryBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-600'}`;
+            document.getElementById('cartDeliveryStatus').textContent = info.msg;
+            document.getElementById('cartDeliveryCharge').textContent = info.charge === 0 ? 'FREE' : `₹${info.charge}`;
+            document.getElementById('cartDeliveryCharge').className = `font-semibold ${info.charge === 0 ? 'text-green-400' : 'text-red-400'}`;
+        }
+
         function addToCart(id) {
             const p = PRODUCTS.find(x => x.id === id);
             if (!p || p.quantity === 0) return;
+            
             const existing = cart.find(x => x.id === id);
-            if (existing) { if(existing.quantity < p.quantity) existing.quantity++; } 
-            else cart.push({ id: p.id, name: p.name, price: p.price, image: p.images?.[0] || p.image, quantity: 1 });
+            if (existing) { 
+                if(existing.quantity < p.quantity) existing.quantity++; 
+                else return showNotification('Maximum stock limit reached!', 'red');
+            } else {
+                cart.push({ id: p.id, name: p.name, price: p.price, image: p.images?.[0] || p.image, quantity: 1 });
+            }
             saveCart();
-            showNotification(`${p.name} added to cart!`);
+            showNotification(`${p.name} added to cart!`, 'green');
         }
 
         function addToCartFromDetails() { 
-            if (currentProduct) { addToCart(currentProduct.id); toggleCart(true); } 
+            if (currentProduct && currentProduct.quantity > 0) { 
+                addToCart(currentProduct.id); 
+                document.getElementById('cartSidebar').classList.add('open');
+            } 
         }
 
-        function showNotification(msg) {
+        function showNotification(msg, color = 'green') {
             const toast = document.getElementById('notificationToast');
             document.getElementById('notificationText').textContent = msg;
-            toast.classList.add('show');
+            toast.className = `fixed bottom-6 right-6 bg-${color}-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 font-medium show`;
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
         function removeFromCart(id) { cart = cart.filter(x => x.id !== id); saveCart(); }
+        
         function updateQty(id, change) {
             const item = cart.find(x => x.id === id);
-            if (item) { item.quantity += change; if (item.quantity <= 0) removeFromCart(id); saveCart(); }
+            const p = PRODUCTS.find(x => x.id === id);
+            if (item) { 
+                item.quantity += change; 
+                if (item.quantity <= 0) removeFromCart(id); 
+                else if (p && item.quantity > p.quantity) item.quantity = p.quantity; 
+                saveCart(); 
+            }
         }
+        
         function saveCart() { localStorage.setItem('jugadteck_cart', JSON.stringify(cart)); updateCartUI(); }
 
         function updateCartUI() {
-            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const delivery = (total >= 1000 || count >= 8) ? 0 : 40;
-            
-            document.getElementById('cartCount').textContent = count;
-            document.getElementById('cartCountModal').textContent = count;
-            document.getElementById('cartSubtotal').textContent = `₹${total}`;
-            document.getElementById('cartTotal').textContent = `${total + delivery}`;
-            document.getElementById('cartDeliveryCharge').textContent = delivery === 0 ? 'FREE' : `₹${delivery}`;
-            document.getElementById('cartDeliveryCharge').className = `font-semibold ${delivery === 0 ? 'text-green-400' : 'text-red-400'}`;
-            
+            const info = getDeliveryInfo();
+            document.getElementById('cartCount').textContent = info.count;
+            document.getElementById('cartCountModal').textContent = info.count;
+            document.getElementById('cartSubtotal').textContent = `₹${info.total}`;
+            document.getElementById('cartTotal').textContent = `₹${info.total + info.charge}`;
+            updateDeliveryProgress();
+
             document.getElementById('cartItems').innerHTML = cart.length === 0 ? 
                 '<div class="text-center text-gray-400 mt-12"><i class="fas fa-shopping-cart text-4xl mb-3"></i><p>Cart is empty</p></div>' :
                 cart.map(item => `
                     <div class="flex gap-3 bg-slate-800/50 p-3 rounded-lg border border-cyan-500/10">
-                        <img src="${item.image}" class="w-16 h-16 object-cover rounded">
+                        <img src="${item.image}" class="w-16 h-16 object-cover rounded border border-gray-600">
                         <div class="flex-1">
                             <h4 class="font-medium text-white text-sm">${item.name}</h4>
                             <p class="text-cyan-400 font-semibold">₹${item.price}</p>
@@ -422,23 +562,26 @@
 
         function toggleCart(forceState) {
             const s = document.getElementById('cartSidebar');
-            if (forceState === true) s.classList.add('open');
-            else if (forceState === false) s.classList.remove('open');
-            else s.classList.toggle('open');
+            if (forceState === true) { s.classList.add('open'); history.pushState({ cartOpen: true }, ''); } 
+            else if (forceState === false) { s.classList.remove('open'); } 
+            else { 
+                if (s.classList.contains('open')) s.classList.remove('open'); 
+                else { s.classList.add('open'); history.pushState({ cartOpen: true }, ''); }
+            }
         }
 
         function buyNowWhatsApp() {
             if (!currentProduct) return;
-            window.open(`https://wa.me/919140781523?text=*Order:* ${currentProduct.name}%0A*Price:* ₹${currentProduct.price}`, '_blank');
+            const msg = `*NEW ORDER*%0A%0A*Product:* ${currentProduct.name}%0A*Price:* ₹${currentProduct.price}%0A%0APlease confirm.`;
+            window.open(`https://wa.me/919140781523?text=${msg}`, '_blank');
         }
 
         function checkoutWhatsApp() {
             if (cart.length === 0) return alert('Cart is empty!');
-            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            const delivery = (total >= 1000 || cart.reduce((a,b) => a + b.quantity, 0) >= 8) ? 0 : 40;
+            const info = getDeliveryInfo();
             let msg = `*JugadTeck Order*%0A%0A`;
-            cart.forEach((item, i) => { msg += `${i+1}. ${item.name} x${item.quantity} - ₹${item.price * item.quantity}%0A`; });
-            msg += `%0A*Total:* ₹${total + delivery}%0A*Delivery:* ${delivery === 0 ? 'FREE' : ''+delivery}`;
+            cart.forEach((item, i) => { msg += `${i+1}. *${item.name}* x${item.quantity} - ₹${item.price * item.quantity}%0A`; });
+            msg += `%0A*Subtotal:* ₹${info.total}%0A*Delivery:* ${info.charge === 0 ? 'FREE' : '₹'+info.charge}%0A*TOTAL:* ₹${info.total + info.charge}%0A%0APlease confirm my order.`;
             window.open(`https://wa.me/919140781523?text=${msg}`, '_blank');
         }
 
