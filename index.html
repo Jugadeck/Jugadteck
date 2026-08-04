@@ -14,28 +14,28 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; background: #0f172a; color: #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; background: #02020a; color: #e2e8f0; }
         
-        /* 3D Background */
+        /* 3D Background Canvas */
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         
         /* Glassmorphism */
-        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.1); }
+        .glass { background: rgba(10, 10, 30, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
         
-        /* 3D Card Styles - Clean but 3D */
+        /* 3D Card Styles */
         .product-card-3d { 
-            background: rgba(30, 41, 59, 0.8); 
-            border: 1px solid rgba(148, 163, 184, 0.1); 
+            background: rgba(20, 20, 40, 0.8); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
             transform-style: preserve-3d; 
             transform: perspective(1000px); 
             transition: box-shadow 0.3s;
         }
-        .product-card-3d:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .product-card-3d:hover { box-shadow: 0 20px 40px rgba(0, 243, 255, 0.15); border-color: rgba(0, 243, 255, 0.3); }
         .product-card-3d .card-content { transform: translateZ(30px); }
         .product-card-3d .card-img-container { transform: translateZ(50px); }
         
-        .btn-primary { background: linear-gradient(135deg, #0891b2, #0e7490); transition: all 0.3s; }
-        .btn-primary:hover { background: linear-gradient(135deg, #0e7490, #155e75); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(8, 145, 178, 0.3); }
+        .btn-primary { background: linear-gradient(135deg, #00f3ff, #0066ff); transition: all 0.3s; color: white; }
+        .btn-primary:hover { box-shadow: 0 0 20px rgba(0, 243, 255, 0.6); transform: translateY(-2px); }
         
         .cart-sidebar { transform: translateX(100%); transition: transform 0.3s; }
         .cart-sidebar.open { transform: translateX(0); }
@@ -44,7 +44,7 @@
         #productDetailsModal.active { display: block; }
         
         .tab-btn { padding: 10px 20px; font-weight: 600; color: #94a3b8; border-bottom: 2px solid transparent; cursor: pointer; }
-        .tab-btn.active { color: #22d3ee; border-bottom-color: #22d3ee; }
+        .tab-btn.active { color: #00f3ff; border-bottom-color: #00f3ff; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
@@ -58,8 +58,8 @@
         .specs-table td:first-child { color: #94a3b8; width: 40%; font-weight: 600; }
         .specs-table td:last-child { color: #cbd5e1; }
         
-        .img-action-btn { position: absolute; top: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
-        .img-action-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.1); }
+        .img-action-btn { position: absolute; top: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); }
+        .img-action-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.1); border-color: #00f3ff; }
         
         #notificationToast { transform: translateY(100px); opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 100; }
         #notificationToast.show { transform: translateY(0); opacity: 1; }
@@ -67,15 +67,16 @@
 </head>
 <body class="min-h-screen">
 
+    <!-- 3D Background Canvas -->
     <canvas id="bg-canvas"></canvas>
 
     <!-- Header -->
-    <header class="glass sticky top-0 z-40 border-b border-gray-700/50">
+    <header class="glass sticky top-0 z-40 border-b border-gray-800">
         <div class="container mx-auto px-4 py-3">
             <div class="flex flex-col gap-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3 cursor-pointer" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(0,243,255,0.5)]">
                             <img src="logo.png" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-sm font-bold text-white\'>JT</span>'">
                         </div>
                         <div class="hidden md:block">
@@ -85,7 +86,7 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <a href="admin.html" class="text-gray-400 hover:text-cyan-400 transition text-lg"><i class="fas fa-user-shield"></i></a>
-                        <button onclick="toggleCart()" class="relative btn-primary text-white px-4 py-2 rounded-full font-semibold text-sm">
+                        <button onclick="toggleCart()" class="relative btn-primary px-4 py-2 rounded-full font-semibold text-sm">
                             <i class="fas fa-shopping-cart mr-2"></i>Cart
                             <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
                         </button>
@@ -93,8 +94,8 @@
                 </div>
                 
                 <div class="relative w-full">
-                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off" class="w-full pl-10 pr-4 py-2 rounded-full bg-slate-800/80 border border-gray-600 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off" class="w-full pl-10 pr-4 py-2 rounded-full bg-slate-900/80 border border-gray-700 text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none transition">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-500"></i>
                     <div id="searchDropdown" class="absolute top-full left-0 w-full mt-2 glass rounded-xl shadow-xl hidden z-50 max-h-96 overflow-y-auto border border-gray-700"></div>
                 </div>
             </div>
@@ -106,23 +107,23 @@
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-5xl font-bold mb-4 text-white">Electronics Components</h2>
             <p class="text-base md:text-lg mb-8 text-gray-400 max-w-2xl mx-auto">Arduino • ESP32 • Raspberry Pi • Sensors • IoT Projects</p>
-            <button onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})" class="btn-primary text-white px-8 py-3 rounded-full font-semibold">
+            <button onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})" class="btn-primary px-8 py-3 rounded-full font-semibold">
                 Shop Now <i class="fas fa-arrow-down ml-2"></i>
             </button>
         </div>
     </section>
 
     <!-- Products -->
-    <section id="products" class="container mx-auto px-4 py-12">
+    <section id="products" class="container mx-auto px-4 py-12 relative z-10">
         <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-white">Our Products</h2>
         <div class="flex flex-wrap justify-center gap-2 mb-8" id="categoryFilters">
             <button onclick="filterProducts('all')" class="filter-btn active px-5 py-2 rounded-full bg-cyan-600 text-white text-sm font-medium">All</button>
-            <button onclick="filterProducts('Arduino')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Arduino</button>
-            <button onclick="filterProducts('ESP32')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">ESP32</button>
-            <button onclick="filterProducts('Sensors')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Sensors</button>
-            <button onclick="filterProducts('Modules')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Modules</button>
-            <button onclick="filterProducts('Project Kit')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Project Kit</button>
-            <button onclick="filterProducts('Projects')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700">Projects</button>
+            <button onclick="filterProducts('Arduino')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700 border border-gray-700">Arduino</button>
+            <button onclick="filterProducts('ESP32')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700 border border-gray-700">ESP32</button>
+            <button onclick="filterProducts('Sensors')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700 border border-gray-700">Sensors</button>
+            <button onclick="filterProducts('Modules')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700 border border-gray-700">Modules</button>
+            <button onclick="filterProducts('Project Kit')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700 border border-gray-700">Project Kit</button>
+            <button onclick="filterProducts('Projects')" class="filter-btn px-5 py-2 rounded-full bg-slate-800 text-gray-300 text-sm font-medium hover:bg-slate-700 border border-gray-700">Projects</button>
         </div>
         <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
     </section>
@@ -176,7 +177,7 @@
                                 <span class="text-xs text-cyan-400" id="deliveryStatusText">Add items to unlock</span>
                             </div>
                             <div class="w-full bg-slate-700 rounded-full h-2">
-                                <div id="deliveryProgressBar" class="bg-cyan-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                <div id="deliveryProgressBar" class="bg-cyan-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -184,7 +185,7 @@
                             <button id="btnBuyNow" onclick="buyNowWhatsApp()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i class="fab fa-whatsapp"></i> Buy Now
                             </button>
-                            <button id="btnAddCart" onclick="addToCartFromDetails()" class="flex-1 btn-primary text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <button id="btnAddCart" onclick="addToCartFromDetails()" class="flex-1 btn-primary py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i class="fas fa-cart-plus"></i> Add to Cart
                             </button>
                         </div>
@@ -219,13 +220,13 @@
                 <span class="text-xs text-cyan-400" id="cartDeliveryStatus">Add items</span>
             </div>
             <div class="w-full bg-slate-700 rounded-full h-2">
-                <div id="cartDeliveryBar" class="bg-cyan-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                <div id="cartDeliveryBar" class="bg-cyan-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
         </div>
 
         <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
         <div class="p-4 border-t border-gray-700 bg-slate-900/80">
-            <div class="flex justify-between mb-2 text-sm"><span class="text-gray-400">Subtotal:</span><span id="cartSubtotal" class="font-semibold text-white">₹0</span></div>
+            <div class="flex justify-between mb-2 text-sm"><span class="text-gray-400">Subtotal:</span><span id="cartSubtotal" class="font-semibold text-white">0</span></div>
             <div class="flex justify-between mb-2 text-sm"><span class="text-gray-400">Delivery:</span><span id="cartDeliveryCharge" class="font-semibold text-red-400">₹40</span></div>
             <div class="flex justify-between mb-4 text-lg border-t border-gray-700 pt-3"><span class="font-bold text-white">Total:</span><span id="cartTotal" class="font-bold text-cyan-400">₹0</span></div>
             <button onclick="checkoutWhatsApp()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2">
@@ -245,18 +246,21 @@
 
     <script src="products.js"></script>
     <script>
-        // 3D Background (Three.js)
+        // --- 3D BACKGROUND (Restored Bright Cyan Network) ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
+        // Bright Cyan Particles
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 800;
+        const particlesCount = 1000; // Increased count for richer look
         const posArray = new Float32Array(particlesCount * 3);
-        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 20; }
+        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 25; } // Spread wider
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({ size: 0.03, color: 0x0891b2, transparent: true, opacity: 0.6 });
+        
+        // Bright Cyan Color (#00f3ff)
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.04, color: 0x00f3ff, transparent: true, opacity: 0.8 });
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
         camera.position.z = 5;
@@ -266,17 +270,17 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            particlesMesh.rotation.y += 0.0003;
-            particlesMesh.rotation.x += 0.0001;
-            camera.position.x += (mouseX * 1 - camera.position.x) * 0.05;
-            camera.position.y += (mouseY * 1 - camera.position.y) * 0.05;
+            particlesMesh.rotation.y += 0.0005; // Faster rotation
+            particlesMesh.rotation.x += 0.0002;
+            camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.05; // More movement
+            camera.position.y += (mouseY * 1.5 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
             renderer.render(scene, camera);
         }
         animate();
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
-        // App Logic
+        // --- APP LOGIC ---
         let cart = JSON.parse(localStorage.getItem('jugadteck_cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('jugadteck_wishlist')) || [];
         let currentProduct = null;
@@ -304,7 +308,7 @@
                             <p class="font-medium text-white text-sm">${p.name}</p>
                             <p class="text-xs text-gray-400">${p.category} ${p.quantity === 0 ? '<span class="text-red-400">(Out of Stock)</span>' : ''}</p>
                         </div>
-                        <span class="font-bold text-cyan-400">${p.price}</span>
+                        <span class="font-bold text-cyan-400">₹${p.price}</span>
                     </div>
                 `).join('');
                 dropdown.classList.remove('hidden');
@@ -329,12 +333,12 @@
                 
                 return `
                 <div class="product-card-3d rounded-xl overflow-hidden relative ${outOfStock ? 'opacity-75' : ''}" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
-                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-10 bg-black/60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/80 transition card-content">
+                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-10 bg-black/60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/80 transition card-content border border-gray-700">
                         <i class="${wished ? 'fas text-red-500' : 'far'} fa-heart"></i>
                     </button>
                     
-                    ${outOfStock ? '<span class="absolute top-3 left-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content">OUT OF STOCK</span>' : ''}
-                    ${p.discount && !outOfStock ? '<span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content">SALE</span>' : ''}
+                    ${outOfStock ? '<span class="absolute top-3 left-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content border border-gray-600">OUT OF STOCK</span>' : ''}
+                    ${p.discount && !outOfStock ? '<span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content shadow-[0_0_10px_rgba(239,68,68,0.5)]">SALE</span>' : ''}
                     
                     <div class="relative h-48 bg-slate-800 overflow-hidden cursor-pointer card-img-container" onclick="${outOfStock ? '' : `openProductDetails(${p.id})`}">
                         <img src="${p.images?.[0] || p.image}" class="w-full h-full object-cover transition duration-500 hover:scale-110">
@@ -351,14 +355,13 @@
                         
                         ${lowStock ? '<p class="text-xs text-orange-400 mb-2"><i class="fas fa-exclamation-triangle mr-1"></i>Only ' + p.quantity + ' left!</p>' : ''}
                         
-                        <button onclick="event.stopPropagation(); addToCart(${p.id})" ${outOfStock ? 'disabled' : ''} class="w-full btn-primary text-white py-2 rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button onclick="event.stopPropagation(); addToCart(${p.id})" ${outOfStock ? 'disabled' : ''} class="w-full btn-primary py-2 rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="fas fa-cart-plus mr-1"></i> ${outOfStock ? 'Sold Out' : 'Add to Cart'}
                         </button>
                     </div>
                 </div>`;
             }).join('');
             
-            // Re-init 3D Tilt
             VanillaTilt.init(document.querySelectorAll(".product-card-3d"), { max: 10, speed: 400, glare: true, "max-glare": 0.1 });
         }
 
@@ -426,7 +429,6 @@
                 </div>
             `).join('') : '<p class="text-gray-500 col-span-2 text-center text-sm">No related products</p>';
             
-            // 3D Tilt for Modal Image
             VanillaTilt.init(document.getElementById("tiltImageContainer"), { max: 15, speed: 400, glare: true, "max-glare": 0.2 });
             
             document.getElementById('productDetailsModal').classList.add('active');
@@ -491,13 +493,13 @@
         function updateDeliveryProgress() {
             const info = getDeliveryInfo();
             document.getElementById('deliveryProgressBar').style.width = `${info.progress}%`;
-            document.getElementById('deliveryProgressBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-600'}`;
+            document.getElementById('deliveryProgressBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-500'}`;
             document.getElementById('deliveryStatusText').textContent = info.msg;
             
             document.getElementById('cartDeliveryBar').style.width = `${info.progress}%`;
-            document.getElementById('cartDeliveryBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-600'}`;
+            document.getElementById('cartDeliveryBar').className = `h-2 rounded-full transition-all duration-500 ${info.progress === 100 ? 'bg-green-500' : 'bg-cyan-500'}`;
             document.getElementById('cartDeliveryStatus').textContent = info.msg;
-            document.getElementById('cartDeliveryCharge').textContent = info.charge === 0 ? 'FREE' : `₹${info.charge}`;
+            document.getElementById('cartDeliveryCharge').textContent = info.charge === 0 ? 'FREE' : `${info.charge}`;
             document.getElementById('cartDeliveryCharge').className = `font-semibold ${info.charge === 0 ? 'text-green-400' : 'text-red-400'}`;
         }
 
