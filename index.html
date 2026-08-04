@@ -3,24 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JugadTeck - Electronics Store</title>
+    <title>JugadTeck - 3D Electronics Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { neon: '#0891b2', darkBg: '#0f172a' } } } }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 3D Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; background: #0f172a; color: #e2e8f0; }
         
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        /* 3D Background */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(6, 182, 212, 0.15); }
+        /* Glassmorphism */
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.1); }
         
-        .product-card { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(6, 182, 212, 0.1); transition: all 0.3s; }
-        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: rgba(6, 182, 212, 0.3); }
+        /* 3D Card Styles - Clean but 3D */
+        .product-card-3d { 
+            background: rgba(30, 41, 59, 0.8); 
+            border: 1px solid rgba(148, 163, 184, 0.1); 
+            transform-style: preserve-3d; 
+            transform: perspective(1000px); 
+            transition: box-shadow 0.3s;
+        }
+        .product-card-3d:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .product-card-3d .card-content { transform: translateZ(30px); }
+        .product-card-3d .card-img-container { transform: translateZ(50px); }
         
         .btn-primary { background: linear-gradient(135deg, #0891b2, #0e7490); transition: all 0.3s; }
-        .btn-primary:hover { background: linear-gradient(135deg, #0e7490, #155e75); transform: translateY(-1px); }
+        .btn-primary:hover { background: linear-gradient(135deg, #0e7490, #155e75); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(8, 145, 178, 0.3); }
         
         .cart-sidebar { transform: translateX(100%); transition: transform 0.3s; }
         .cart-sidebar.open { transform: translateX(0); }
@@ -43,7 +58,7 @@
         .specs-table td:first-child { color: #94a3b8; width: 40%; font-weight: 600; }
         .specs-table td:last-child { color: #cbd5e1; }
         
-        .img-action-btn { position: absolute; top: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .img-action-btn { position: absolute; top: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
         .img-action-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.1); }
         
         #notificationToast { transform: translateY(100px); opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 100; }
@@ -55,12 +70,12 @@
     <canvas id="bg-canvas"></canvas>
 
     <!-- Header -->
-    <header class="glass sticky top-0 z-40 border-b border-cyan-500/20">
+    <header class="glass sticky top-0 z-40 border-b border-gray-700/50">
         <div class="container mx-auto px-4 py-3">
             <div class="flex flex-col gap-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3 cursor-pointer" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
                             <img src="logo.png" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-sm font-bold text-white\'>JT</span>'">
                         </div>
                         <div class="hidden md:block">
@@ -78,9 +93,9 @@
                 </div>
                 
                 <div class="relative w-full">
-                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off" class="w-full pl-10 pr-4 py-2 rounded-full bg-slate-800/80 border border-cyan-500/20 text-white placeholder-gray-400 focus:border-cyan-500/40 focus:outline-none">
+                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off" class="w-full pl-10 pr-4 py-2 rounded-full bg-slate-800/80 border border-gray-600 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition">
                     <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-                    <div id="searchDropdown" class="absolute top-full left-0 w-full mt-2 glass rounded-xl shadow-xl hidden z-50 max-h-96 overflow-y-auto"></div>
+                    <div id="searchDropdown" class="absolute top-full left-0 w-full mt-2 glass rounded-xl shadow-xl hidden z-50 max-h-96 overflow-y-auto border border-gray-700"></div>
                 </div>
             </div>
         </div>
@@ -115,8 +130,8 @@
     <!-- PRODUCT DETAILS MODAL -->
     <div id="productDetailsModal" class="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm">
         <div class="min-h-screen px-4 py-8 flex items-center justify-center">
-            <div class="glass rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto border border-cyan-500/20">
-                <div class="sticky top-0 bg-slate-900/95 backdrop-blur border-b border-cyan-500/20 p-4 flex justify-between items-center z-20">
+            <div class="glass rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl">
+                <div class="sticky top-0 bg-slate-900/95 backdrop-blur border-b border-gray-700 p-4 flex justify-between items-center z-20">
                     <button onclick="closeProductDetails()" class="text-gray-400 hover:text-white flex items-center gap-2">
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
@@ -127,12 +142,12 @@
                 </div>
                 
                 <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="relative bg-slate-800/50 rounded-xl p-4 border border-cyan-500/10">
+                    <div class="relative bg-slate-800/50 rounded-xl p-4 border border-gray-700" id="tiltImageContainer">
                         <div class="absolute top-4 right-4 flex gap-2 z-10">
                             <button id="modalShareBtn" class="img-action-btn"><i class="fas fa-share-alt text-white"></i></button>
                             <button id="modalWishlistBtn" class="img-action-btn"><i class="far fa-heart text-white"></i></button>
                         </div>
-                        <img id="detailImage" src="" alt="Product" class="w-full h-auto object-contain max-h-80">
+                        <img id="detailImage" src="" alt="Product" class="w-full h-auto object-contain max-h-80 drop-shadow-2xl">
                         <div class="flex gap-2 mt-4 overflow-x-auto" id="thumbnailContainer"></div>
                     </div>
 
@@ -145,7 +160,7 @@
                             </div>
                         </div>
                         
-                        <div class="bg-slate-800/50 p-4 rounded-xl border border-cyan-500/10">
+                        <div class="bg-slate-800/50 p-4 rounded-xl border border-gray-700">
                             <p class="text-xs text-gray-400 mb-1">Price</p>
                             <div class="flex items-baseline gap-3">
                                 <span class="text-3xl font-bold text-white" id="detailPrice"></span>
@@ -155,7 +170,7 @@
                             <p class="text-xs text-gray-500 mt-2">Inclusive of all taxes • Free delivery available</p>
                         </div>
 
-                        <div class="bg-slate-800/30 p-3 rounded-lg border border-cyan-500/10">
+                        <div class="bg-slate-800/30 p-3 rounded-lg border border-gray-700">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-xs font-semibold text-cyan-400"><i class="fas fa-truck mr-1"></i>Free Delivery</span>
                                 <span class="text-xs text-cyan-400" id="deliveryStatusText">Add items to unlock</span>
@@ -192,13 +207,13 @@
     </div>
 
     <!-- Cart Sidebar -->
-    <div id="cartSidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full md:w-[400px] glass shadow-2xl z-[60] flex flex-col border-l border-cyan-500/20">
-        <div class="p-4 border-b border-cyan-500/20 bg-slate-900/80 flex justify-between items-center">
+    <div id="cartSidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full md:w-[400px] glass shadow-2xl z-[60] flex flex-col border-l border-gray-700">
+        <div class="p-4 border-b border-gray-700 bg-slate-900/80 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-white"><i class="fas fa-shopping-cart mr-2"></i>Cart</h3>
             <button onclick="toggleCart(false)" class="text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
         </div>
         
-        <div class="p-3 border-b border-cyan-500/10 bg-slate-800/50">
+        <div class="p-3 border-b border-gray-700 bg-slate-800/50">
             <div class="flex justify-between items-center mb-2">
                 <span class="text-xs font-semibold text-cyan-400"><i class="fas fa-truck mr-1"></i>Free Delivery</span>
                 <span class="text-xs text-cyan-400" id="cartDeliveryStatus">Add items</span>
@@ -209,7 +224,7 @@
         </div>
 
         <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-        <div class="p-4 border-t border-cyan-500/20 bg-slate-900/80">
+        <div class="p-4 border-t border-gray-700 bg-slate-900/80">
             <div class="flex justify-between mb-2 text-sm"><span class="text-gray-400">Subtotal:</span><span id="cartSubtotal" class="font-semibold text-white">₹0</span></div>
             <div class="flex justify-between mb-2 text-sm"><span class="text-gray-400">Delivery:</span><span id="cartDeliveryCharge" class="font-semibold text-red-400">₹40</span></div>
             <div class="flex justify-between mb-4 text-lg border-t border-gray-700 pt-3"><span class="font-bold text-white">Total:</span><span id="cartTotal" class="font-bold text-cyan-400">₹0</span></div>
@@ -226,25 +241,25 @@
 
     <a href="https://wa.me/919140781523" target="_blank" class="fixed bottom-6 right-6 z-40 bg-green-600 hover:bg-green-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-2xl"></i></a>
 
-    <footer class="glass mt-16 border-t border-cyan-500/20"><div class="container mx-auto px-4 py-6 text-center"><p class="text-gray-400 text-sm">© 2024 JugadTeck | +91 9140781523</p></div></footer>
+    <footer class="glass mt-16 border-t border-gray-700"><div class="container mx-auto px-4 py-6 text-center"><p class="text-gray-400 text-sm">© 2024 JugadTeck | +91 9140781523</p></div></footer>
 
     <script src="products.js"></script>
     <script>
-        // 3D Background
+        // 3D Background (Three.js)
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 500;
+        const particlesCount = 800;
         const posArray = new Float32Array(particlesCount * 3);
-        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 15; }
+        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 20; }
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({ size: 0.025, color: 0x0891b2, transparent: true, opacity: 0.6 });
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.03, color: 0x0891b2, transparent: true, opacity: 0.6 });
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
-        camera.position.z = 4;
+        camera.position.z = 5;
 
         let mouseX = 0, mouseY = 0;
         document.addEventListener('mousemove', (e) => { mouseX = (e.clientX / window.innerWidth) * 2 - 1; mouseY = -(e.clientY / window.innerHeight) * 2 + 1; });
@@ -253,12 +268,13 @@
             requestAnimationFrame(animate);
             particlesMesh.rotation.y += 0.0003;
             particlesMesh.rotation.x += 0.0001;
-            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
-            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.position.x += (mouseX * 1 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 1 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
             renderer.render(scene, camera);
         }
         animate();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
         // App Logic
         let cart = JSON.parse(localStorage.getItem('jugadteck_cart')) || [];
@@ -288,7 +304,7 @@
                             <p class="font-medium text-white text-sm">${p.name}</p>
                             <p class="text-xs text-gray-400">${p.category} ${p.quantity === 0 ? '<span class="text-red-400">(Out of Stock)</span>' : ''}</p>
                         </div>
-                        <span class="font-bold text-cyan-400">₹${p.price}</span>
+                        <span class="font-bold text-cyan-400">${p.price}</span>
                     </div>
                 `).join('');
                 dropdown.classList.remove('hidden');
@@ -312,25 +328,25 @@
                 const wished = wishlist.includes(p.id);
                 
                 return `
-                <div class="product-card rounded-xl overflow-hidden relative ${outOfStock ? 'opacity-75' : ''}">
-                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-10 bg-black/60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/80 transition">
+                <div class="product-card-3d rounded-xl overflow-hidden relative ${outOfStock ? 'opacity-75' : ''}" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
+                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-3 right-3 z-10 bg-black/60 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/80 transition card-content">
                         <i class="${wished ? 'fas text-red-500' : 'far'} fa-heart"></i>
                     </button>
                     
-                    ${outOfStock ? '<span class="absolute top-3 left-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-medium">OUT OF STOCK</span>' : ''}
-                    ${p.discount && !outOfStock ? '<span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-medium">SALE</span>' : ''}
+                    ${outOfStock ? '<span class="absolute top-3 left-3 bg-gray-800 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content">OUT OF STOCK</span>' : ''}
+                    ${p.discount && !outOfStock ? '<span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-medium z-10 card-content">SALE</span>' : ''}
                     
-                    <div class="relative h-48 bg-slate-800 overflow-hidden cursor-pointer" onclick="${outOfStock ? '' : `openProductDetails(${p.id})`}">
+                    <div class="relative h-48 bg-slate-800 overflow-hidden cursor-pointer card-img-container" onclick="${outOfStock ? '' : `openProductDetails(${p.id})`}">
                         <img src="${p.images?.[0] || p.image}" class="w-full h-full object-cover transition duration-500 hover:scale-110">
                     </div>
                     
-                    <div class="p-4">
+                    <div class="p-4 card-content">
                         <span class="text-xs text-cyan-400 font-semibold uppercase">${p.category}</span>
                         <h3 class="font-semibold text-white mt-1 mb-2 line-clamp-2">${p.name}</h3>
                         
                         <div class="flex items-baseline gap-2 mb-3">
                             <span class="text-xl font-bold text-white">₹${p.price}</span>
-                            ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-sm text-gray-500 line-through">₹${p.originalPrice}</span><span class="text-xs text-green-400 font-semibold">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% off</span>` : ''}
+                            ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-sm text-gray-500 line-through">${p.originalPrice}</span><span class="text-xs text-green-400 font-semibold">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% off</span>` : ''}
                         </div>
                         
                         ${lowStock ? '<p class="text-xs text-orange-400 mb-2"><i class="fas fa-exclamation-triangle mr-1"></i>Only ' + p.quantity + ' left!</p>' : ''}
@@ -341,6 +357,9 @@
                     </div>
                 </div>`;
             }).join('');
+            
+            // Re-init 3D Tilt
+            VanillaTilt.init(document.querySelectorAll(".product-card-3d"), { max: 10, speed: 400, glare: true, "max-glare": 0.1 });
         }
 
         function openProductDetails(id) {
@@ -357,11 +376,7 @@
             document.getElementById('detailPrice').textContent = `₹${currentProduct.price}`;
             document.getElementById('detailDescription').textContent = currentProduct.description;
             
-            // Stock status
             const stockEl = document.getElementById('detailStockStatus');
-            const btnBuy = document.getElementById('btnBuyNow');
-            const btnCart = document.getElementById('btnAddCart');
-            
             if (currentProduct.quantity <= 2) {
                 stockEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i>Only ${currentProduct.quantity} left!`;
                 stockEl.className = 'text-sm font-medium text-orange-400';
@@ -370,7 +385,6 @@
                 stockEl.className = 'text-sm font-medium text-green-400';
             }
             
-            // Price & discount
             if (currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price) {
                 document.getElementById('detailOriginalPrice').textContent = `₹${currentProduct.originalPrice}`;
                 document.getElementById('detailOriginalPrice').classList.remove('hidden');
@@ -382,7 +396,6 @@
                 document.getElementById('detailDiscount').classList.add('hidden');
             }
             
-            // Specifications
             if (currentProduct.specifications) {
                 document.getElementById('detailSpecifications').innerHTML = currentProduct.specifications.split('\n').filter(s => s.trim()).map(spec => {
                     const parts = spec.split(':');
@@ -390,32 +403,31 @@
                 }).join('');
             }
             
-            // Thumbnails
             document.getElementById('thumbnailContainer').innerHTML = images.map((img, idx) => 
                 `<img src="${img}" class="w-16 h-16 object-cover rounded border-2 ${idx===0?'border-cyan-500':'border-gray-600'} cursor-pointer hover:border-cyan-500 transition flex-shrink-0" onclick="changeImage('${img}', ${idx})">`
             ).join('');
             
-            // Wishlist button
             const wBtn = document.getElementById('modalWishlistBtn');
             const wished = wishlist.includes(id);
             wBtn.innerHTML = `<i class="${wished ? 'fas text-red-500' : 'far text-white'} fa-heart"></i>`;
             wBtn.onclick = () => toggleWishlist(id);
             
-            // Share button
             document.getElementById('modalShareBtn').onclick = () => {
                 const msg = `Check out ${currentProduct.name} on JugadTeck! Price: ₹${currentProduct.price}. Link: ${window.location.href}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
             
-            // Related products
             const related = PRODUCTS.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id && (p.quantity === undefined || p.quantity > 0)).slice(0, 6);
             document.getElementById('relatedProductsGrid').innerHTML = related.length > 0 ? related.map(p => `
-                <div class="bg-slate-800 rounded-lg p-3 cursor-pointer hover:bg-slate-700 transition border border-cyan-500/10" onclick="openProductDetails(${p.id})">
+                <div class="bg-slate-800 rounded-lg p-3 cursor-pointer hover:bg-slate-700 transition border border-gray-700" onclick="openProductDetails(${p.id})">
                     <img src="${p.images?.[0] || p.image}" class="w-full h-20 object-cover rounded mb-2">
                     <p class="font-medium text-white text-sm line-clamp-2">${p.name}</p>
                     <p class="text-cyan-400 font-semibold text-sm mt-1">₹${p.price}</p>
                 </div>
             `).join('') : '<p class="text-gray-500 col-span-2 text-center text-sm">No related products</p>';
+            
+            // 3D Tilt for Modal Image
+            VanillaTilt.init(document.getElementById("tiltImageContainer"), { max: 15, speed: 400, glare: true, "max-glare": 0.2 });
             
             document.getElementById('productDetailsModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -544,7 +556,7 @@
             document.getElementById('cartItems').innerHTML = cart.length === 0 ? 
                 '<div class="text-center text-gray-400 mt-12"><i class="fas fa-shopping-cart text-4xl mb-3"></i><p>Cart is empty</p></div>' :
                 cart.map(item => `
-                    <div class="flex gap-3 bg-slate-800/50 p-3 rounded-lg border border-cyan-500/10">
+                    <div class="flex gap-3 bg-slate-800/50 p-3 rounded-lg border border-gray-700">
                         <img src="${item.image}" class="w-16 h-16 object-cover rounded border border-gray-600">
                         <div class="flex-1">
                             <h4 class="font-medium text-white text-sm">${item.name}</h4>
